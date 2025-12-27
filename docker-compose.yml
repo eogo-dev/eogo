@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  eogo-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: eogo-api
+    restart: always
+    ports:
+      - "8025:8025"
+    environment:
+      - APP_ENV=production
+      - SERVER_PORT=8025
+      - DB_CONNECTION=postgres
+      - DB_HOST=eogo-db
+      - DB_PORT=5432
+      - DB_DATABASE=eogo
+      - DB_USERNAME=eogo_user
+      - DB_PASSWORD=eogo_pass
+      - JWT_SECRET=${JWT_SECRET:-eogo_secret_vibe_enterprise}
+      - TZ=Asia/Shanghai
+    depends_on:
+      eogo-db:
+        condition: service_healthy
+    networks:
+      - eogo-network
+
+  eogo-db:
+    image: postgres:14-alpine
+    container_name: eogo-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=eogo
+      - POSTGRES_USER=eogo_user
+      - POSTGRES_PASSWORD=eogo_pass
+      - TZ=Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - eogo_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eogo_user -d eogo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eogo-network
+
+networks:
+  eogo-network:
+    driver: bridge
+
+volumes:
+  eogo_db_data:
