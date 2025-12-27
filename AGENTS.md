@@ -1,63 +1,63 @@
 # AGENTS.md
 
-AI 编码助手工作指南。
+Instructions for AI coding agents working on the Eogo framework.
 
-## 项目概述
+## Project Overview
 
-EOGO 是一个现代化 Go 框架，采用领域驱动设计 (DDD) + 分层架构。
+EOGO is a modern Go framework using Domain-Driven Design (DDD) + layered architecture.
 
-## 目录结构
+## Directory Structure
 
 ```text
 eogo/
 ├── cmd/
-│   ├── eogo/              # CLI 工具
-│   └── server/            # HTTP 服务入口
+│   ├── eogo/              # CLI tool
+│   └── server/            # HTTP server entry
 ├── internal/
-│   ├── bootstrap/         # 应用启动
-│   ├── domain/            # 领域实体 (核心业务)
-│   ├── modules/           # 业务模块
-│   │   └── user/          # 示例: 8 个文件
-│   │       ├── model.go       # 数据库实体 (UserPO)
-│   │       ├── dto.go         # DTO + Mapper 函数
-│   │       ├── repository.go  # 数据访问层
-│   │       ├── service.go     # 业务逻辑层
-│   │       ├── handler.go     # HTTP 处理器
-│   │       ├── routes.go      # 路由注册
+│   ├── bootstrap/         # Application startup
+│   ├── domain/            # Domain entities (core business)
+│   ├── modules/           # Business modules
+│   │   └── user/          # Example: 8 files
+│   │       ├── model.go       # Database entity (UserPO)
+│   │       ├── dto.go         # DTO + Mapper functions
+│   │       ├── repository.go  # Data access layer
+│   │       ├── service.go     # Business logic layer
+│   │       ├── handler.go     # HTTP handlers
+│   │       ├── routes.go      # Route registration
 │   │       ├── provider.go    # Wire DI
 │   │       └── service_test.go
-│   ├── infra/             # 基础设施 (33+ 组件)
-│   └── wiring/            # Wire 依赖注入
-├── pkg/                   # 公共库
-├── routes/                # 全局路由
-└── tests/                 # 测试
+│   ├── infra/             # Infrastructure (33+ components)
+│   └── wiring/            # Wire dependency injection
+├── pkg/                   # Public libraries
+├── routes/                # Global routes
+└── tests/                 # Tests
 ```
 
-## 常用命令
+## Common Commands
 
 ```bash
-make build         # 构建 CLI
-make test          # 运行测试
-make lint          # 代码检查
-make wire          # 生成 DI
-make air           # 热重载开发
+make build         # Build CLI
+make test          # Run tests
+make lint          # Code linting
+make wire          # Generate DI
+make air           # Hot-reload dev server
 ```
 
-## 模块结构 (8 文件标准)
+## Module Structure (8-file standard)
 
-| 文件 | 职责 |
-|------|------|
-| `model.go` | 数据库实体 `UserPO` (GORM) |
-| `dto.go` | 请求/响应 DTO + `toDomain()`/`toUserPO()` 转换 |
-| `repository.go` | 数据访问，返回 `domain.User` |
-| `service.go` | 业务逻辑，使用 `domain.User` |
-| `handler.go` | HTTP 处理器 |
-| `routes.go` | 路由注册 |
+| File | Responsibility |
+|------|----------------|
+| `model.go` | Database entity `UserPO` (GORM) |
+| `dto.go` | Request/Response DTO + `toDomain()`/`toUserPO()` mappers |
+| `repository.go` | Data access, returns `domain.User` |
+| `service.go` | Business logic, uses `domain.User` |
+| `handler.go` | HTTP handlers |
+| `routes.go` | Route registration |
 | `provider.go` | Wire ProviderSet |
 
-## Domain 层
+## Domain Layer
 
-`internal/domain/` 包含核心业务实体：
+`internal/domain/` contains core business entities:
 
 ```go
 // internal/domain/user.go
@@ -69,9 +69,9 @@ type User struct {
 }
 ```
 
-**数据流**: `Handler(DTO) → Service(domain.User) → Repository(UserPO)`
+**Data Flow**: `Handler(DTO) → Service(domain.User) → Repository(UserPO)`
 
-## 统一响应
+## Unified Response
 
 ```go
 import "github.com/eogo-dev/eogo/pkg/response"
@@ -81,7 +81,7 @@ response.BadRequest(c, "error", err)
 response.NotFound(c, "not found", err)
 ```
 
-## 分页
+## Pagination
 
 ```go
 import "github.com/eogo-dev/eogo/pkg/pagination"
@@ -90,7 +90,7 @@ paginator, _ := pagination.PaginateFromContext[User](c, db)
 c.JSON(200, paginator)
 ```
 
-## Wire 依赖注入
+## Wire Dependency Injection
 
 ```go
 // internal/modules/user/provider.go
@@ -103,36 +103,36 @@ var ProviderSet = wire.NewSet(
 )
 ```
 
-运行 `cd internal/wiring && wire` 生成代码。
+Run `cd internal/wiring && wire` to generate code.
 
-## 创建新模块
+## Creating New Modules
 
 ```bash
 ./eogo make:module Blog
 
-# 然后:
-# 1. 在 routes/api.go 注册路由
-# 2. 运行 wire
+# Then:
+# 1. Register routes in routes/api.go
+# 2. Run wire
 ```
 
-## 开发规范
+## Development Guidelines
 
-1. **DTO 包含 Mapper** - 转换函数放在 `dto.go`
-2. **使用 Domain 层** - 业务逻辑使用 `domain.User`
-3. **私有实现** - 结构体首字母小写
-4. **构造函数返回接口** - `NewService() Service`
+1. **DTO includes Mapper** - Mapper functions go in `dto.go`
+2. **Use Domain Layer** - Business logic uses `domain.User`
+3. **Private implementations** - Struct names are unexported
+4. **Constructors return interfaces** - `NewService() Service`
 5. **snake_case JSON** - `json:"user_id"`
-6. **英文代码注释** - 代码和注释用英文
+6. **English comments** - All code and comments in English
 
-## 测试
+## Testing
 
 ```bash
-# 单元测试
+# Unit tests
 go test ./internal/modules/user/...
 
-# 集成测试
+# Integration tests
 go test ./tests/integration/...
 
-# 所有测试
+# All tests
 make test
 ```

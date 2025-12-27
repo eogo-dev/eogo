@@ -1,88 +1,88 @@
 # EOGO 🚀
 **Evolving Orchestration for Go**
 
-现代化高性能 Go 框架，专为企业级 SaaS 应用设计。
+A modern, high-performance Go framework designed for enterprise-grade SaaS applications.
 
 ![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=for-the-badge&logo=go)
 ![Architecture](https://img.shields.io/badge/Arch-DDD-success?style=for-the-badge)
 
 ---
 
-## ✨ 特性
+## ✨ Features
 
-- **领域驱动设计 (DDD)**: 清晰的领域层 + 模块化业务
-- **企业级基础设施**: 熔断器、限流器、链路追踪、配置热更新
-- **开发者优先**: CLI 代码生成、Wire 依赖注入、完善测试
-- **生产就绪**: CI/CD、代码质量检查、OpenAPI 文档
+- **Domain-Driven Design (DDD)**: Clean domain layer + modular business logic
+- **Enterprise Infrastructure**: Circuit breaker, rate limiter, tracing, config hot-reload
+- **Developer First**: CLI code generation, Wire DI, comprehensive testing
+- **Production Ready**: CI/CD, code quality checks, OpenAPI documentation
 
 ---
 
-## 📂 项目结构
+## 📂 Project Structure
 
 ```text
 eogo/
 ├── cmd/
-│   ├── eogo/              # CLI 工具
-│   └── server/            # HTTP 服务入口
+│   ├── eogo/              # CLI tool
+│   └── server/            # HTTP server entry
 ├── internal/
-│   ├── bootstrap/         # 应用启动与生命周期
-│   ├── domain/            # 核心领域实体 (DDD)
-│   ├── modules/           # 业务模块 (user, permission, llm)
-│   ├── infra/             # 基础设施 (33+ 组件)
-│   │   ├── breaker/       # 熔断器
-│   │   ├── ratelimit/     # 限流器 (内存/Redis)
-│   │   ├── config/        # 配置管理 (热更新)
+│   ├── bootstrap/         # Application lifecycle
+│   ├── domain/            # Core domain entities (DDD)
+│   ├── modules/           # Business modules (user, permission, llm)
+│   ├── infra/             # Infrastructure (33+ components)
+│   │   ├── breaker/       # Circuit breaker
+│   │   ├── ratelimit/     # Rate limiter (memory/Redis)
+│   │   ├── config/        # Config management (hot-reload)
 │   │   ├── tracing/       # OpenTelemetry
 │   │   └── ...
-│   └── wiring/            # Wire 依赖注入
-├── pkg/                   # 可复用公共库
-├── routes/                # 路由注册
-├── tests/                 # 测试 (unit/integration/e2e)
-├── docs/                  # 文档
+│   └── wiring/            # Wire dependency injection
+├── pkg/                   # Reusable public libraries
+├── routes/                # Route registration
+├── tests/                 # Tests (unit/integration/e2e)
+├── docs/                  # Documentation
 └── .github/workflows/     # CI/CD
 ```
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
 ```bash
-# 克隆并配置
+# Clone and configure
 git clone https://github.com/eogo-dev/eogo.git && cd eogo
 cp .env.example .env
 
-# 安装依赖
+# Install dependencies
 go mod download
 
-# 启动开发服务器
+# Start development server
 make air
 ```
 
-访问: `http://localhost:8025`
+Visit: `http://localhost:8025`
 
 ---
 
-## �️ 常用命令
+## 🛠️ Common Commands
 
 ```bash
-make help          # 查看所有命令
-make build         # 构建 CLI
-make test          # 运行测试
-make lint          # 代码检查
-make cover         # 覆盖率报告
-make wire          # 生成依赖注入
-make docs          # 生成 API 文档
+make help          # Show all commands
+make build         # Build CLI
+make test          # Run tests
+make lint          # Code linting
+make cover         # Coverage report
+make wire          # Generate DI code
+make docs          # Generate API docs
 ```
 
 ---
 
-## 📖 文档
+## 📖 Documentation
 
-- [开发指南](docs/guide/README.md)
-- [模块开发](internal/modules/README.md)
-- [依赖注入 (Wire)](docs/dependency_injection.md)
-- [AI 协作指南](AGENTS.md)
-- [API 文档](docs/api/)
+- [Development Guide](docs/guide/README.md)
+- [Module Development](internal/modules/README.md)
+- [Dependency Injection (Wire)](docs/dependency_injection.md)
+- [AI Collaboration Guide](AGENTS.md)
+- [API Documentation](docs/api/)
 
 ---
 
