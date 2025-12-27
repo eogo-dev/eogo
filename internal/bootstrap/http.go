@@ -13,6 +13,8 @@ import (
 
 	"github.com/eogo-dev/eogo/internal/app"
 	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/eogo-dev/eogo/internal/infra/health"
+	"github.com/eogo-dev/eogo/internal/infra/metrics"
 	"github.com/eogo-dev/eogo/internal/infra/middleware"
 	"github.com/eogo-dev/eogo/internal/infra/tracing"
 	"github.com/eogo-dev/eogo/pkg/logger"
@@ -27,6 +29,7 @@ type HttpKernel struct {
 	App            *app.Application
 	Engine         *gin.Engine
 	TracerProvider *tracing.TracerProvider
+	Health         *health.Health
 }
 
 // NewHttpKernel creates a new HTTP kernel from Wire-injected Application
@@ -72,8 +75,19 @@ func NewHttpKernel(application *app.Application) *HttpKernel {
 	r.Use(logger.GinLogger())
 	r.Use(gin.Recovery())
 
+	// Add Prometheus metrics middleware
+	r.Use(metrics.Middleware())
+
 	// Apply Global Middleware (CORS mainly)
 	applyGlobalMiddleware(r, application.Config)
+
+	// Initialize Health Checks
+	h := health.New()
+	h.Register("database", health.DatabaseChecker(application.DB))
+
+	// Register health and metrics routes
+	h.RegisterRoutes(r)
+	r.GET("/metrics", metrics.Handler())
 
 	// Register Routes
 	// We temporarily silence Gin's default route logging to keep console clean
@@ -88,6 +102,7 @@ func NewHttpKernel(application *app.Application) *HttpKernel {
 		App:            application,
 		Engine:         r,
 		TracerProvider: tracerProvider,
+		Health:         h,
 	}
 }
 
