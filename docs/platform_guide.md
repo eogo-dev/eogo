@@ -556,7 +556,7 @@ func (h *Handler) Create(c *gin.Context) {
 package mymodule
 
 import (
-    "github.com/eogo-dev/eogo/internal/platform/router"
+    "github.com/eogo-dev/eogo/internal/infra/router"
 )
 
 func Register(r *router.Router) {

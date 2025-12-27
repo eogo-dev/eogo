@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/pkg/logger"
 )
 
 func TestLog_Levels(t *testing.T) {

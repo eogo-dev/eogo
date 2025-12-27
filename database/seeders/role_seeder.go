@@ -2,14 +2,12 @@ package seeders
 
 import (
 	"github.com/eogo-dev/eogo/internal/modules/permission"
-	"github.com/eogo-dev/eogo/internal/platform/database"
+	"gorm.io/gorm"
 )
 
 type RoleSeeder struct{}
 
-func (s *RoleSeeder) Run() error {
-	db := database.GetDB()
-
+func (s *RoleSeeder) Run(db *gorm.DB) error {
 	roles := []permission.Role{
 		{Name: "admin", DisplayName: "Administrator", Description: "Full access to all resources", IsDefault: false},
 		{Name: "user", DisplayName: "User", Description: "Standard user access", IsDefault: true},

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/eogo-dev/eogo/internal/platform/env"
+	"github.com/eogo-dev/eogo/internal/infra/env"
 )
 
 func TestEnv_Get(t *testing.T) {

@@ -5,65 +5,88 @@ import (
 	"testing"
 	"time"
 
+	"github.com/eogo-dev/eogo/internal/app"
 	"github.com/eogo-dev/eogo/internal/bootstrap"
-	"github.com/eogo-dev/eogo/internal/platform/config"
-	"github.com/eogo-dev/eogo/internal/platform/container"
-	"github.com/eogo-dev/eogo/internal/platform/database"
-	"github.com/eogo-dev/eogo/internal/platform/jwt"
-	test_platform "github.com/eogo-dev/eogo/internal/platform/testing"
+	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/eogo-dev/eogo/internal/infra/database"
+	"github.com/eogo-dev/eogo/internal/infra/email"
+	"github.com/eogo-dev/eogo/internal/infra/jwt"
+	"github.com/eogo-dev/eogo/internal/infra/middleware"
+	test_platform "github.com/eogo-dev/eogo/internal/infra/testing"
+	"github.com/eogo-dev/eogo/internal/modules/permission"
+	"github.com/eogo-dev/eogo/internal/modules/user"
 	"github.com/eogo-dev/eogo/routes"
 	"github.com/gin-gonic/gin"
 )
 
-// SetupApp initializes the application for testing
+// SetupApp initializes the application for feature testing.
+// Uses manual DI instead of Wire for test flexibility.
 func SetupApp() *gin.Engine {
 	// 1. Create Test Config
 	cfg := &config.Config{}
 	cfg.Server.Mode = "test"
 	cfg.Database.Enabled = true
-	cfg.Database.Driver = "sqlite" // Use SQLite for speed
-	cfg.Database.Memory = true     // In-memory
+	cfg.Database.Driver = "sqlite"
+	cfg.Database.Memory = true
 	cfg.Database.MaxIdleConns = 1
 	cfg.Database.MaxOpenConns = 1
-	// ... other configs if needed (JWT secret etc)
 	cfg.JWT.Secret = "testing-secret"
 	cfg.JWT.Expire = time.Hour
 
-	container.App().Set(container.ServiceConfig, cfg)
-
-	// 2. Initialize Dependencies
-	jwt.Init(cfg)
-	container.App().Set(container.ServiceJWT, jwt.MustServiceInstance())
-
-	// 3. Initialize Database (In-Memory)
-	// Note: We need to run Migrations here ideally.
-	db, err := database.InitDB(cfg.Database)
+	// 2. Initialize Database (In-Memory SQLite)
+	db, err := database.NewDB(cfg)
 	if err != nil {
-		fmt.Printf("InitDB Error: %v\n", err)
+		fmt.Printf("NewDB Error: %v\n", err)
 		panic("failed to init test db: " + err.Error())
 	}
-	// 4. Run Migrations
+
+	// 3. Run Migrations
 	if err := bootstrap.RunMigrations(db); err != nil {
 		fmt.Printf("RunMigrations Error: %v\n", err)
 		panic("failed to run migrations for test db: " + err.Error())
 	}
-	// db.AutoMigrate(&User{}) ... but User struct is in internal/modules/user.
-	// Circular dependency risk if we import user module here?
-	// Ideally, SetupApp calls a function that registers all migrations.
 
-	container.App().Set(container.ServiceDB, db)
+	// 4. Create Services via DI
+	jwtService := jwt.NewService(cfg)
+	emailService := email.NewService(cfg)
 
-	// 4. Setup Router
+	// Set JWT service for middleware
+	middleware.SetJWTService(jwtService)
+
+	// 5. Create Repositories
+	userRepo := user.NewRepository(db)
+	permRepo := permission.NewRepository(db)
+
+	// 6. Create Services
+	userService := user.NewService(userRepo, jwtService)
+	permService := permission.NewService(permRepo)
+
+	// 7. Create Handlers
+	handlers := &app.Handlers{
+		User:       user.NewHandler(userService),
+		Permission: permission.NewHandler(permService),
+	}
+
+	// 8. Build Application
+	_ = &app.Application{
+		Config:       cfg,
+		DB:           db,
+		JWTService:   jwtService,
+		EmailService: emailService,
+		Handlers:     handlers,
+	}
+
+	// 9. Setup Router
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
-	routes.Setup(r)
+	routes.Setup(r, handlers)
 
 	return r
 }
 
 // NewTestCase is a shortcut to create a test case with the setup app
 func NewTestCase(t *testing.T) *test_platform.TestCase {
-	app := SetupApp()
-	return test_platform.NewTestCase(t, app)
+	engine := SetupApp()
+	return test_platform.NewTestCase(t, engine)
 }

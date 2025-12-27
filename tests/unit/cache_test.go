@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/cache"
+	"github.com/eogo-dev/eogo/internal/infra/cache"
 )
 
 func TestMemoryStore_PutAndGet(t *testing.T) {

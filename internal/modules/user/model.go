@@ -6,8 +6,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// User represents the user model
-type User struct {
+// UserPO is the persistent object for database operations (internal to repository)
+// This struct contains GORM tags and is NOT exposed outside the repository layer
+type UserPO struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -24,7 +25,7 @@ type User struct {
 }
 
 // TableName specifies the database table name
-func (User) TableName() string {
+func (UserPO) TableName() string {
 	return "users"
 }
 

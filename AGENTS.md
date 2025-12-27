@@ -69,10 +69,10 @@ type User struct {
 **GORM handles this automatically** - no manual intervention needed.
 
 ### 2. Unified Response Structure
-Use `internal/platform/response` for consistent API responses:
+Use `internal/infra/response` for consistent API responses:
 
 ```go
-import "github.com/eogo-dev/eogo/internal/platform/response"
+import "github.com/eogo-dev/eogo/internal/infra/response"
 
 // Success response
 response.Success(c, data)
@@ -97,10 +97,10 @@ response.InternalServerError(c, "Server error", err)
 ```
 
 ### 3. Pagination
-Use `internal/platform/pagination` for paginated results:
+Use `internal/infra/pagination` for paginated results:
 
 ```go
-import "github.com/eogo-dev/eogo/internal/platform/pagination"
+import "github.com/eogo-dev/eogo/internal/infra/pagination"
 
 // From Gin context (auto-extracts ?page=1&per_page=15)
 paginator, err := pagination.PaginateFromContext[User](c, db)

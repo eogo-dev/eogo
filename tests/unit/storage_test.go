@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/eogo-dev/eogo/internal/platform/storage"
+	"github.com/eogo-dev/eogo/internal/infra/storage"
 )
 
 func setupTestStorage(t *testing.T) (*storage.LocalDisk, string) {

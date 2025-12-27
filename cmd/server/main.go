@@ -1,7 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/eogo-dev/eogo/internal/bootstrap"
+	"github.com/eogo-dev/eogo/internal/wiring"
 )
 
 // @title Eogo API
@@ -11,12 +14,16 @@ import (
 // @BasePath /v1
 
 func main() {
-	// Initialize Application
-	app := bootstrap.NewApp()
+	// 1. Initialize Logger
+	bootstrap.InitLogger()
 
-	// Initialize HTTP Kernel
-	kernel := bootstrap.NewHttpKernel(app)
+	// 2. Initialize Application via Wire DI
+	application, err := wiring.InitApplication()
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
+	}
 
-	// Handle Request
+	// 3. Create HTTP Kernel and Start Server
+	kernel := bootstrap.NewHttpKernel(application)
 	kernel.Handle()
 }

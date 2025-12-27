@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/ratelimit"
+	"github.com/eogo-dev/eogo/internal/infra/ratelimit"
 	"github.com/gin-gonic/gin"
 )
 

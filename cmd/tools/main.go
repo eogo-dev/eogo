@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/eogo-dev/eogo/internal/platform/config"
-	"github.com/eogo-dev/eogo/internal/platform/storage"
+	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/eogo-dev/eogo/internal/infra/storage"
 )
 
 func main() {

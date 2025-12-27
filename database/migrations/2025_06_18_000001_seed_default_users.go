@@ -11,10 +11,10 @@ func init() {
 		ID: "2025_06_18_000001_seed_default_users",
 		Migrate: func(db *gorm.DB) error {
 			var count int64
-			db.Model(&user.User{}).Count(&count)
+			db.Model(&user.UserPO{}).Count(&count)
 
 			if count == 0 {
-				adminUser := &user.User{
+				adminUser := &user.UserPO{
 					Username: "admin",
 					Email:    "admin@example.com",
 					Password: "hashed_password_here",
@@ -26,7 +26,7 @@ func init() {
 			return nil
 		},
 		Rollback: func(db *gorm.DB) error {
-			return db.Where("username = ?", "admin").Delete(&user.User{}).Error
+			return db.Where("username = ?", "admin").Delete(&user.UserPO{}).Error
 		},
 	})
 }

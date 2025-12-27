@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/health"
+	"github.com/eogo-dev/eogo/internal/infra/health"
 	"github.com/gin-gonic/gin"
 )
 

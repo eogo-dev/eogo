@@ -22,8 +22,8 @@ func TestUserRegistration(t *testing.T) {
 		}).
 		Call().
 		AssertOk().
-		AssertJSONPath("username", "testuser").
-		AssertJSONPath("email", email)
+		AssertJSONPath("data.username", "testuser").
+		AssertJSONPath("data.email", email)
 }
 
 func TestUserLogin(t *testing.T) {
@@ -50,5 +50,5 @@ func TestUserLogin(t *testing.T) {
 		}).
 		Call().
 		AssertOk().
-		AssertJSONStructure([]string{"access_token", "user"})
+		AssertJSONStructure([]string{"data.access_token", "data.user"})
 }

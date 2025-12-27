@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/eogo-dev/eogo/internal/platform/config"
+	"github.com/eogo-dev/eogo/internal/infra/config"
 	"github.com/gin-gonic/gin"
 )
 

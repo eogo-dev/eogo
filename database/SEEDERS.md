@@ -34,7 +34,7 @@ database/
 package seeders
 
 import (
-    "github.com/eogo-dev/eogo/internal/platform/database"
+    "github.com/eogo-dev/eogo/internal/infra/database"
 )
 
 type ProductSeeder struct{}
@@ -66,7 +66,7 @@ package seeders
 
 import (
     "github.com/eogo-dev/eogo/internal/modules/blog"
-    "github.com/eogo-dev/eogo/internal/platform/database"
+    "github.com/eogo-dev/eogo/internal/infra/database"
 )
 
 type PostSeeder struct{}

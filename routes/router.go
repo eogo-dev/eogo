@@ -1,16 +1,17 @@
 package routes
 
 import (
-	"github.com/eogo-dev/eogo/internal/platform/middleware"
-	"github.com/eogo-dev/eogo/internal/platform/monitor"
-	"github.com/eogo-dev/eogo/internal/platform/router"
+	"github.com/eogo-dev/eogo/internal/app"
+	"github.com/eogo-dev/eogo/internal/infra/middleware"
+	"github.com/eogo-dev/eogo/internal/infra/monitor"
+	"github.com/eogo-dev/eogo/internal/infra/router"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // Setup configures all application routes using the fluent router API
-func Setup(engine *gin.Engine) *router.Router {
+func Setup(engine *gin.Engine, handlers *app.Handlers) *router.Router {
 	r := router.New(engine)
 
 	// Register middleware groups
@@ -32,7 +33,7 @@ func Setup(engine *gin.Engine) *router.Router {
 
 	// Register V1 API Routes
 	r.Group("/v1", func(api *router.Router) {
-		RegisterAPI(api)
+		RegisterAPI(api, handlers)
 	})
 
 	// Register Monitor

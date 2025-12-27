@@ -1,8 +1,10 @@
 package seeders
 
+import "gorm.io/gorm"
+
 // Seeder interface defines the contract for database seeders
 type Seeder interface {
-	Run() error
+	Run(db *gorm.DB) error
 }
 
 var registry []Seeder
@@ -15,4 +17,14 @@ func register(s Seeder) {
 // All returns all registered seeders
 func All() []Seeder {
 	return registry
+}
+
+// RunAll executes all registered seeders with the given database connection
+func RunAll(db *gorm.DB) error {
+	for _, seeder := range registry {
+		if err := seeder.Run(db); err != nil {
+			return err
+		}
+	}
+	return nil
 }

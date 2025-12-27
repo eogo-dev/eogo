@@ -4,35 +4,29 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/config"
-	"github.com/eogo-dev/eogo/internal/platform/jwt"
+	"github.com/eogo-dev/eogo/internal/domain"
+	"github.com/eogo-dev/eogo/internal/infra/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TestMain initializes dependencies for testing
-func TestMain(m *testing.M) {
-	cfg := &config.Config{}
-	cfg.JWT.Secret = "test-secret"
-	cfg.JWT.Expire = time.Hour
-	jwt.Init(cfg)
-	m.Run()
-}
+// testJWTService is a shared JWT service instance for all tests in this package.
+// Uses jwt.NewTestService() which provides a pre-configured test service.
+var testJWTService = jwt.NewTestService()
 
-// MockUserRepository is a mock implementation of Repository
+// MockUserRepository is a mock implementation of domain.UserRepository
 type MockUserRepository struct {
 	mock.Mock
 }
 
-func (m *MockUserRepository) Create(ctx context.Context, u *User) error {
+func (m *MockUserRepository) Create(ctx context.Context, u *domain.User) error {
 	args := m.Called(ctx, u)
 	return args.Error(0)
 }
 
-func (m *MockUserRepository) Update(ctx context.Context, u *User) error {
+func (m *MockUserRepository) Update(ctx context.Context, u *domain.User) error {
 	args := m.Called(ctx, u)
 	return args.Error(0)
 }
@@ -42,46 +36,47 @@ func (m *MockUserRepository) Delete(ctx context.Context, id uint) error {
 	return args.Error(0)
 }
 
-func (m *MockUserRepository) FindByID(ctx context.Context, id uint) (*User, error) {
+func (m *MockUserRepository) FindByID(ctx context.Context, id uint) (*domain.User, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*User), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindAll(ctx context.Context, page, pageSize int) ([]*User, int64, error) {
+func (m *MockUserRepository) FindAll(ctx context.Context, page, pageSize int) ([]*domain.User, int64, error) {
 	args := m.Called(ctx, page, pageSize)
-	return args.Get(0).([]*User), args.Get(1).(int64), args.Error(2)
+	return args.Get(0).([]*domain.User), args.Get(1).(int64), args.Error(2)
 }
 
-func (m *MockUserRepository) FindByUsername(ctx context.Context, username string) (*User, error) {
+func (m *MockUserRepository) FindByUsername(ctx context.Context, username string) (*domain.User, error) {
 	args := m.Called(ctx, username)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*User), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*User, error) {
+func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	args := m.Called(ctx, email)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*User), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
 // Test Cases
 
 func TestUserService_GetProfile_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
-	expectedUser := &User{
+	expectedUser := &domain.User{
 		ID:       1,
 		Username: "testuser",
 		Email:    "test@example.com",
+		Status:   1,
 	}
 	mockRepo.On("FindByID", ctx, uint(1)).Return(expectedUser, nil)
 
@@ -95,7 +90,7 @@ func TestUserService_GetProfile_Success(t *testing.T) {
 
 func TestUserService_GetProfile_NotFound(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
 	mockRepo.On("FindByID", ctx, uint(999)).Return(nil, errors.New("record not found"))
@@ -109,7 +104,7 @@ func TestUserService_GetProfile_NotFound(t *testing.T) {
 
 func TestUserService_Register_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
 	req := &UserRegisterRequest{
@@ -119,8 +114,8 @@ func TestUserService_Register_Success(t *testing.T) {
 	}
 
 	mockRepo.On("FindByEmail", ctx, req.Email).Return(nil, errors.New("not found"))
-	// Create should be called with matched user object. We use mock.AnythingOfType for *User
-	mockRepo.On("Create", ctx, mock.AnythingOfType("*user.User")).Return(nil)
+	// Create should be called with matched user object. We use mock.AnythingOfType for *domain.User
+	mockRepo.On("Create", ctx, mock.AnythingOfType("*domain.User")).Return(nil)
 
 	user, err := service.Register(ctx, req)
 
@@ -131,20 +126,14 @@ func TestUserService_Register_Success(t *testing.T) {
 }
 
 func TestUserService_Login_Success(t *testing.T) {
-	// Initialize JWT for test
-	cfg := &config.Config{}
-	cfg.JWT.Secret = "test-secret"
-	cfg.JWT.Expire = time.Hour
-	jwt.Init(cfg)
-
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
 	password := "password123"
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
-	existingUser := &User{
+	existingUser := &domain.User{
 		ID:       1,
 		Username: "loginuser",
 		Password: string(hashedPassword),
@@ -153,7 +142,7 @@ func TestUserService_Login_Success(t *testing.T) {
 
 	mockRepo.On("FindByUsername", ctx, "loginuser").Return(existingUser, nil)
 	// Update last login
-	mockRepo.On("Update", ctx, mock.AnythingOfType("*user.User")).Return(nil)
+	mockRepo.On("Update", ctx, mock.AnythingOfType("*domain.User")).Return(nil)
 
 	req := &UserLoginRequest{
 		Username: "loginuser",
@@ -171,7 +160,7 @@ func TestUserService_Login_Success(t *testing.T) {
 
 func TestUserService_DeleteAccount_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
 	mockRepo.On("Delete", ctx, uint(1)).Return(nil)
@@ -184,12 +173,12 @@ func TestUserService_DeleteAccount_Success(t *testing.T) {
 
 func TestUserService_List_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)
-	service := NewService(mockRepo, jwt.MustServiceInstance())
+	service := NewService(mockRepo, testJWTService)
 	ctx := context.Background()
 
-	users := []*User{
-		{ID: 1, Username: "user1"},
-		{ID: 2, Username: "user2"},
+	users := []*domain.User{
+		{ID: 1, Username: "user1", Status: 1},
+		{ID: 2, Username: "user2", Status: 1},
 	}
 	mockRepo.On("FindAll", ctx, 1, 10).Return(users, int64(2), nil)
 

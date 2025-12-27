@@ -1,37 +1,30 @@
 package user
 
 import (
-	"github.com/eogo-dev/eogo/internal/platform/database"
-	"github.com/eogo-dev/eogo/internal/platform/jwt"
-	"github.com/eogo-dev/eogo/internal/platform/router"
+	"github.com/eogo-dev/eogo/internal/infra/router"
 )
 
-// Register registers user module routes
-func Register(r *router.Router) {
-	db := database.GetDB()
-	repo := NewRepository(db)
-	jwtSvc := jwt.MustServiceInstance()
-	service := NewService(repo, jwtSvc)
-	handler := NewHandler(service)
-
+// RegisterRoutes registers the user module routes
+// It uses the injected handler instance instead of creating a new one
+func (h *Handler) RegisterRoutes(r *router.Router) {
 	// Public routes
-	r.POST("/register", handler.Register).Name("auth.register")
-	r.POST("/login", handler.Login).Name("auth.login")
-	r.POST("/password/reset", handler.ResetPassword).Name("auth.password.reset")
+	r.POST("/register", h.Register).Name("auth.register")
+	r.POST("/login", h.Login).Name("auth.login")
+	r.POST("/password/reset", h.ResetPassword).Name("auth.password.reset")
 
 	// Protected routes
 	r.Group("", func(auth *router.Router) {
 		auth.WithMiddleware("auth")
 
 		// Profile
-		auth.GET("/users/profile", handler.GetProfile).Name("users.profile")
-		auth.PUT("/users/profile", handler.UpdateProfile).Name("users.profile.update")
-		auth.PUT("/users/password", handler.ChangePassword).Name("users.password.update")
-		auth.DELETE("/users/account", handler.DeleteAccount).Name("users.account.delete")
+		auth.GET("/users/profile", h.GetProfile).Name("users.profile")
+		auth.PUT("/users/profile", h.UpdateProfile).Name("users.profile.update")
+		auth.PUT("/users/password", h.ChangePassword).Name("users.password.update")
+		auth.DELETE("/users/account", h.DeleteAccount).Name("users.account.delete")
 
 		// User management
-		auth.GET("/users", handler.List).Name("users.index")
-		auth.GET("/users/:id", handler.Get).Name("users.show").WhereNumber("id")
-		auth.GET("/users/:id/info", handler.GetUserInfo).Name("users.info").WhereNumber("id")
+		auth.GET("/users", h.List).Name("users.index")
+		auth.GET("/users/:id", h.Get).Name("users.show").WhereNumber("id")
+		auth.GET("/users/:id/info", h.GetUserInfo).Name("users.info").WhereNumber("id")
 	})
 }

@@ -40,7 +40,7 @@ type repository struct {
 }
 
 // NewRepository creates a new permission repository
-func NewRepository(db *gorm.DB) Repository {
+func NewRepository(db *gorm.DB) *repository {
 	return &repository{db: db}
 }
 

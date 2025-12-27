@@ -10,7 +10,7 @@ func init() {
 	register(&gormigrate.Migration{
 		ID: "2025_06_18_000000_create_users_table",
 		Migrate: func(db *gorm.DB) error {
-			return db.AutoMigrate(&user.User{})
+			return db.AutoMigrate(&user.UserPO{})
 		},
 		Rollback: func(db *gorm.DB) error {
 			return db.Migrator().DropTable("users")

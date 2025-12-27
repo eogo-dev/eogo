@@ -173,7 +173,7 @@ const serviceTemplate = `package {{.PackageName}}
 
 import (
 	"context"
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/pkg/logger"
 )
 
 // {{.ModelName}}Service defines the {{.ModelName}} service interface
@@ -228,7 +228,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/pkg/logger"
 	"github.com/eogo-dev/eogo/pkg/response"
 )
 
@@ -335,7 +335,7 @@ const repositoryTemplate = `package {{.PackageName}}
 import (
 	"context"
 	"gorm.io/gorm"
-	"github.com/eogo-dev/eogo/internal/platform/database"
+	"github.com/eogo-dev/eogo/internal/infra/database"
 )
 
 // {{.ModelName}}Repository defines the {{.ModelName}} repository interface

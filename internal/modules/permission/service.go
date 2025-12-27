@@ -35,7 +35,7 @@ type service struct {
 }
 
 // NewService creates a new permission service
-func NewService(repo Repository) Service {
+func NewService(repo Repository) *service {
 	return &service{repo: repo}
 }
 

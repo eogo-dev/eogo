@@ -11,7 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/internal/app"
+	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/eogo-dev/eogo/internal/infra/middleware"
+	"github.com/eogo-dev/eogo/internal/infra/tracing"
+	"github.com/eogo-dev/eogo/pkg/logger"
 	"github.com/eogo-dev/eogo/pkg/support"
 	"github.com/eogo-dev/eogo/routes"
 	"github.com/gin-contrib/cors"
@@ -20,53 +24,87 @@ import (
 
 // HttpKernel handles HTTP server lifecycle
 type HttpKernel struct {
-	App    *Application
-	Engine *gin.Engine
+	App            *app.Application
+	Engine         *gin.Engine
+	TracerProvider *tracing.TracerProvider
 }
 
-// NewHttpKernel creates a new HTTP kernel
-func NewHttpKernel(app *Application) *HttpKernel {
+// NewHttpKernel creates a new HTTP kernel from Wire-injected Application
+func NewHttpKernel(application *app.Application) *HttpKernel {
+	// Set JWT service for middleware
+	middleware.SetJWTService(application.JWTService)
+
 	// Set Mode
-	setGinMode(app.Config.Server.Mode)
+	setGinMode(application.Config.Server.Mode)
 
 	// Create Engine
 	r := gin.New()
+
+	// Initialize Tracing (if enabled)
+	var tracerProvider *tracing.TracerProvider
+	if application.Config.Tracing.Enabled {
+		tp, err := tracing.NewTracerProvider(&tracing.Config{
+			Enabled:     true,
+			ServiceName: application.Config.App.Name,
+			Environment: application.Config.App.Env,
+			Endpoint:    application.Config.Tracing.Endpoint,
+			Insecure:    application.Config.Tracing.Insecure,
+			SampleRate:  application.Config.Tracing.SampleRate,
+			Debug:       application.Config.App.Debug,
+		})
+		if err != nil {
+			log.Printf("Warning: Failed to initialize tracing: %v", err)
+		} else {
+			tracerProvider = tp
+			// Add tracing middleware
+			r.Use(tracing.Middleware(application.Config.App.Name))
+			r.Use(tracing.InjectTraceID())
+			log.Println("OpenTelemetry tracing enabled")
+
+			// Add GORM tracing
+			if err := tracing.WithTracing(application.DB, application.Config.App.Name); err != nil {
+				log.Printf("Warning: Failed to add GORM tracing: %v", err)
+			}
+		}
+	}
 
 	// Add custom logger and recovery middleware
 	r.Use(logger.GinLogger())
 	r.Use(gin.Recovery())
 
 	// Apply Global Middleware (CORS mainly)
-	applyGlobalMiddleware(r, app)
+	applyGlobalMiddleware(r, application.Config)
 
 	// Register Routes
 	// We temporarily silence Gin's default route logging to keep console clean
 	gin.SetMode(gin.ReleaseMode) // Temporarily set to release to silence route logs
-	routes.Setup(r)
-	setGinMode(app.Config.Server.Mode) // Restore correct mode
+	routes.Setup(r, application.Handlers)
+	setGinMode(application.Config.Server.Mode) // Restore correct mode
 
 	// Print Professional Banner
 	support.PrintBanner("1.0.0")
 
 	return &HttpKernel{
-		App:    app,
-		Engine: r,
+		App:            application,
+		Engine:         r,
+		TracerProvider: tracerProvider,
 	}
 }
 
-// Handle starts the HTTP server
+// Handle starts the HTTP server with graceful shutdown
 func (k *HttpKernel) Handle() {
 	cfg := k.App.Config
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 
 	srv := &http.Server{
-		Addr:    addr,
-		Handler: k.Engine,
+		Addr:         addr,
+		Handler:      k.Engine,
+		ReadTimeout:  time.Duration(cfg.Server.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(cfg.Server.WriteTimeout) * time.Second,
 	}
 
-	// Start Server
+	// Start Server in goroutine
 	go func() {
-		// Build clickable URL
 		host := cfg.Server.Host
 		if host == "" {
 			host = "localhost"
@@ -85,18 +123,47 @@ func (k *HttpKernel) Handle() {
 	}()
 
 	// Graceful Shutdown
+	k.gracefulShutdown(srv)
+}
+
+// gracefulShutdown handles graceful shutdown of the server and resources
+func (k *HttpKernel) gracefulShutdown(srv *http.Server) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Create context with timeout for shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// 1. Shutdown HTTP server (stop accepting new requests, wait for existing)
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+		log.Printf("HTTP server shutdown error: %v", err)
 	}
-	log.Println("Server exiting")
+
+	// 2. Shutdown tracer provider (flush remaining spans)
+	if k.TracerProvider != nil {
+		if err := k.TracerProvider.Shutdown(ctx); err != nil {
+			log.Printf("Tracer shutdown error: %v", err)
+		} else {
+			log.Println("Tracer provider shutdown complete")
+		}
+	}
+
+	// 3. Close database connection
+	if k.App.DB != nil {
+		if sqlDB, err := k.App.DB.DB(); err == nil {
+			if err := sqlDB.Close(); err != nil {
+				log.Printf("Database close error: %v", err)
+			} else {
+				log.Println("Database connection closed")
+			}
+		}
+	}
+
+	log.Println("Server exited gracefully")
 }
 
 func setGinMode(mode string) {
@@ -110,8 +177,7 @@ func setGinMode(mode string) {
 	}
 }
 
-func applyGlobalMiddleware(r *gin.Engine, app *Application) {
-	cfg := app.Config
+func applyGlobalMiddleware(r *gin.Engine, cfg *config.Config) {
 	corsConfig := cors.Config{
 		AllowOrigins:     cfg.CORS.AllowOrigins,
 		AllowMethods:     cfg.CORS.AllowMethods,

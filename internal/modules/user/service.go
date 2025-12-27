@@ -2,13 +2,13 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/email"
-	"github.com/eogo-dev/eogo/internal/platform/jwt"
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/internal/domain"
+	"github.com/eogo-dev/eogo/internal/infra/email"
+	"github.com/eogo-dev/eogo/internal/infra/jwt"
+	"github.com/eogo-dev/eogo/pkg/logger"
 	"github.com/eogo-dev/eogo/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,31 +29,16 @@ type Service interface {
 
 // service implements the Service interface
 type service struct {
-	repo       Repository
+	repo       domain.UserRepository
 	jwtService *jwt.Service
 }
 
 // NewService creates a new service instance
-func NewService(repo Repository, jwtService *jwt.Service) Service {
+func NewService(repo domain.UserRepository, jwtService *jwt.Service) *service {
 	return &service{
 		repo:       repo,
 		jwtService: jwtService,
 	}
-}
-
-// Create creates a new user
-func (s *service) Create(ctx context.Context, model *User) error {
-	return s.repo.Create(ctx, model)
-}
-
-// Update updates an existing user
-func (s *service) Update(ctx context.Context, model *User) error {
-	return s.repo.Update(ctx, model)
-}
-
-// Delete deletes a user by ID
-func (s *service) Delete(ctx context.Context, id uint) error {
-	return s.repo.Delete(ctx, id)
 }
 
 // GetByID retrieves a user by ID
@@ -62,7 +47,7 @@ func (s *service) GetByID(ctx context.Context, id uint) (*UserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.ToResponse(user), nil
+	return toUserResponse(user), nil
 }
 
 // List retrieves a paginated list of users
@@ -74,7 +59,7 @@ func (s *service) List(ctx context.Context, page, pageSize int) ([]*UserResponse
 
 	var res []*UserResponse
 	for _, u := range users {
-		res = append(res, s.ToResponse(u))
+		res = append(res, toUserResponse(u))
 	}
 	return res, total, nil
 }
@@ -84,7 +69,7 @@ func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*User
 	// Check if email already exists
 	exists, err := s.repo.FindByEmail(ctx, req.Email)
 	if err == nil && exists != nil {
-		return nil, errors.New("email already registered")
+		return nil, domain.ErrEmailAlreadyExists
 	}
 
 	// Hash password
@@ -93,7 +78,7 @@ func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*User
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	user := &User{
+	user := &domain.User{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: string(hashedPassword),
@@ -111,7 +96,7 @@ func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*User
 		logger.Error("failed to send welcome email:", map[string]any{"error": err})
 	}
 
-	return s.ToResponse(user), nil
+	return toUserResponse(user), nil
 }
 
 // Login handles user login
@@ -120,16 +105,16 @@ func (s *service) Login(ctx context.Context, req *UserLoginRequest) (*UserLoginR
 	if err != nil {
 		user, err = s.repo.FindByEmail(ctx, req.Username)
 		if err != nil {
-			return nil, errors.New("invalid username or password")
+			return nil, domain.ErrInvalidCredentials
 		}
 	}
 
-	if user.Status == 0 {
-		return nil, errors.New("account is disabled")
+	if !user.IsActive() {
+		return nil, domain.ErrAccountDisabled
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, domain.ErrInvalidCredentials
 	}
 
 	token, err := s.jwtService.GenerateToken(user.ID, user.Username)
@@ -143,7 +128,7 @@ func (s *service) Login(ctx context.Context, req *UserLoginRequest) (*UserLoginR
 
 	return &UserLoginResponse{
 		AccessToken: token,
-		User:        user,
+		User:        toUserResponseData(user),
 	}, nil
 }
 
@@ -151,16 +136,16 @@ func (s *service) Login(ctx context.Context, req *UserLoginRequest) (*UserLoginR
 func (s *service) GetProfile(ctx context.Context, userID uint) (*UserResponse, error) {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, domain.ErrUserNotFound
 	}
-	return s.ToResponse(user), nil
+	return toUserResponse(user), nil
 }
 
 // UpdateProfile updates user profile
 func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UserUpdateRequest) (*UserResponse, error) {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, domain.ErrUserNotFound
 	}
 
 	if req.Nickname != "" {
@@ -180,18 +165,18 @@ func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UserUpdat
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
-	return s.ToResponse(user), nil
+	return toUserResponse(user), nil
 }
 
 // ChangePassword changes user password
 func (s *service) ChangePassword(ctx context.Context, userID uint, req *UserChangePasswordRequest) error {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
-		return errors.New("user not found")
+		return domain.ErrUserNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
-		return errors.New("incorrect old password")
+		return fmt.Errorf("incorrect old password")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
@@ -207,7 +192,7 @@ func (s *service) ChangePassword(ctx context.Context, userID uint, req *UserChan
 func (s *service) ResetPassword(ctx context.Context, req *UserPasswordResetRequest) error {
 	user, err := s.repo.FindByEmail(ctx, req.Email)
 	if err != nil {
-		return errors.New("email not found")
+		return domain.ErrUserNotFound
 	}
 
 	newPassword := utils.GenerateRandomString(12)
@@ -249,7 +234,8 @@ func (s *service) GetUserByID(ctx context.Context, id uint) (*UserInfo, error) {
 	}, nil
 }
 
-func (s *service) ToResponse(user *User) *UserResponse {
+// toUserResponse converts domain.User to UserResponse DTO
+func toUserResponse(user *domain.User) *UserResponse {
 	return &UserResponse{
 		ID:        user.ID,
 		Username:  user.Username,
@@ -261,5 +247,20 @@ func (s *service) ToResponse(user *User) *UserResponse {
 		Status:    user.Status,
 		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
+	}
+}
+
+// toUserResponseData converts domain.User to UserResponseData for login response
+func toUserResponseData(user *domain.User) *UserResponseData {
+	return &UserResponseData{
+		ID:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		Nickname:  user.Nickname,
+		Avatar:    user.Avatar,
+		Phone:     user.Phone,
+		Bio:       user.Bio,
+		Status:    user.Status,
+		LastLogin: user.LastLogin,
 	}
 }

@@ -2,15 +2,13 @@ package seeders
 
 import (
 	"github.com/eogo-dev/eogo/internal/modules/user"
-	"github.com/eogo-dev/eogo/internal/platform/database"
+	"gorm.io/gorm"
 )
 
 type UserSeeder struct{}
 
-func (s *UserSeeder) Run() error {
-	db := database.GetDB()
-
-	users := []user.User{
+func (s *UserSeeder) Run(db *gorm.DB) error {
+	users := []user.UserPO{
 		{
 			Username: "admin",
 			Email:    "admin@example.com",
@@ -28,7 +26,7 @@ func (s *UserSeeder) Run() error {
 	}
 
 	for _, u := range users {
-		if err := db.FirstOrCreate(&u, user.User{Email: u.Email}).Error; err != nil {
+		if err := db.FirstOrCreate(&u, user.UserPO{Email: u.Email}).Error; err != nil {
 			return err
 		}
 	}

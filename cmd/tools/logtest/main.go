@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/pkg/logger"
 )
 
 func main() {

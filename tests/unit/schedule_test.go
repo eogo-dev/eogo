@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/platform/schedule"
+	"github.com/eogo-dev/eogo/internal/infra/schedule"
 )
 
 func TestEvent_EveryMinute(t *testing.T) {

@@ -1,10 +1,10 @@
 package user
 
 import (
-	"net/http"
 	"strconv"
 
-	"github.com/eogo-dev/eogo/internal/platform/logger"
+	"github.com/eogo-dev/eogo/pkg/logger"
+	"github.com/eogo-dev/eogo/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,17 +32,17 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) Register(c *gin.Context) {
 	var req UserRegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Invalid request parameters", err)
 		return
 	}
 
 	user, err := h.service.Register(c.Request.Context(), &req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Registration failed", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	response.Success(c, user)
 }
 
 // Login handles user login
@@ -57,17 +57,17 @@ func (h *Handler) Register(c *gin.Context) {
 func (h *Handler) Login(c *gin.Context) {
 	var req UserLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Invalid request parameters", err)
 		return
 	}
 
 	resp, err := h.service.Login(c.Request.Context(), &req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Login failed", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	response.Success(c, resp)
 }
 
 // UpdateProfile updates user profile
@@ -82,24 +82,24 @@ func (h *Handler) Login(c *gin.Context) {
 func (h *Handler) UpdateProfile(c *gin.Context) {
 	userIDVal, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "Unauthorized")
 		return
 	}
 	userID := userIDVal.(uint)
 
 	var req UserUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request parameters"})
+		response.BadRequest(c, "Invalid request parameters", err)
 		return
 	}
 
 	user, err := h.service.UpdateProfile(c.Request.Context(), userID, &req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to update profile", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	response.Success(c, user)
 }
 
 // ChangePassword changes user password
@@ -114,23 +114,23 @@ func (h *Handler) UpdateProfile(c *gin.Context) {
 func (h *Handler) ChangePassword(c *gin.Context) {
 	userIDVal, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "Unauthorized")
 		return
 	}
 	userID := userIDVal.(uint)
 
 	var req UserChangePasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request parameters"})
+		response.BadRequest(c, "Invalid request parameters", err)
 		return
 	}
 
 	if err := h.service.ChangePassword(c.Request.Context(), userID, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to change password", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "password changed successfully"})
+	response.Success(c, gin.H{"message": "Password changed successfully"})
 }
 
 // ResetPassword resets user password
@@ -145,16 +145,16 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 func (h *Handler) ResetPassword(c *gin.Context) {
 	var req UserPasswordResetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Invalid request parameters", err)
 		return
 	}
 
 	if err := h.service.ResetPassword(c.Request.Context(), &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to reset password", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "password reset email sent"})
+	response.Success(c, gin.H{"message": "Password reset email sent"})
 }
 
 // GetProfile gets user profile
@@ -169,23 +169,23 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 func (h *Handler) GetProfile(c *gin.Context) {
 	userIDVal, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "Unauthorized")
 		return
 	}
 
 	userID, ok := userIDVal.(uint)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid user ID type"})
+		response.InternalServerError(c, "Invalid user ID type", nil)
 		return
 	}
 
 	user, err := h.service.GetProfile(c.Request.Context(), userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c, "Failed to get profile", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	response.Success(c, user)
 }
 
 // DeleteAccount deletes user account
@@ -197,17 +197,17 @@ func (h *Handler) GetProfile(c *gin.Context) {
 func (h *Handler) DeleteAccount(c *gin.Context) {
 	userIDVal, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		response.Unauthorized(c, "Unauthorized")
 		return
 	}
 	userID := userIDVal.(uint)
 
 	if err := h.service.DeleteAccount(c.Request.Context(), userID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to delete account", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "account deleted"})
+	response.Success(c, gin.H{"message": "Account deleted"})
 }
 
 // Get gets user by ID
@@ -222,17 +222,17 @@ func (h *Handler) Get(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		response.BadRequest(c, "Invalid user ID", err)
 		return
 	}
 
 	user, err := h.service.GetByID(c.Request.Context(), uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		response.NotFound(c, "User not found", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	response.Success(c, user)
 }
 
 // List gets user list
@@ -250,12 +250,12 @@ func (h *Handler) List(c *gin.Context) {
 
 	users, total, err := h.service.List(c.Request.Context(), page, pageSize)
 	if err != nil {
-		logger.Error("failed to get user list:", map[string]any{"error": err})
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user list"})
+		logger.Error("Failed to get user list", map[string]any{"error": err})
+		response.InternalServerError(c, "Failed to get user list", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"total": total, "list": users})
+	response.Success(c, gin.H{"total": total, "list": users})
 }
 
 // GetUserInfo gets user info
@@ -271,15 +271,15 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		response.BadRequest(c, "Invalid user ID", err)
 		return
 	}
 
 	userInfo, err := h.service.GetUserByID(c.Request.Context(), uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		response.NotFound(c, "User not found", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, userInfo)
+	response.Success(c, userInfo)
 }

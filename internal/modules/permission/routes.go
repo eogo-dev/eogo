@@ -1,36 +1,31 @@
 package permission
 
 import (
-	"github.com/eogo-dev/eogo/internal/platform/database"
-	"github.com/eogo-dev/eogo/internal/platform/router"
+	"github.com/eogo-dev/eogo/internal/infra/router"
 )
 
-// Register registers permission module routes
-func Register(r *router.Router) {
-	db := database.GetDB()
-	repo := NewRepository(db)
-	service := NewService(repo)
-	handler := NewHandler(service)
-
+// RegisterRoutes registers permission module routes
+// It uses the injected handler instance
+func (h *Handler) RegisterRoutes(r *router.Router) {
 	// Role routes (admin only)
 	r.Group("", func(auth *router.Router) {
 		auth.WithMiddleware("auth")
 
 		// Role management
-		auth.POST("/roles", handler.CreateRole).Name("roles.store")
-		auth.GET("/roles", handler.ListRoles).Name("roles.index")
-		auth.GET("/roles/:id", handler.GetRole).Name("roles.show").WhereNumber("id")
-		auth.PUT("/roles/:id", handler.UpdateRole).Name("roles.update").WhereNumber("id")
-		auth.DELETE("/roles/:id", handler.DeleteRole).Name("roles.destroy").WhereNumber("id")
+		auth.POST("/roles", h.CreateRole).Name("roles.store")
+		auth.GET("/roles", h.ListRoles).Name("roles.index")
+		auth.GET("/roles/:id", h.GetRole).Name("roles.show").WhereNumber("id")
+		auth.PUT("/roles/:id", h.UpdateRole).Name("roles.update").WhereNumber("id")
+		auth.DELETE("/roles/:id", h.DeleteRole).Name("roles.destroy").WhereNumber("id")
 
 		// Role assignment
-		auth.POST("/roles/assign", handler.AssignRole).Name("roles.assign")
-		auth.POST("/roles/remove", handler.RemoveRole).Name("roles.remove")
+		auth.POST("/roles/assign", h.AssignRole).Name("roles.assign")
+		auth.POST("/roles/remove", h.RemoveRole).Name("roles.remove")
 
 		// User roles
-		auth.GET("/users/:id/roles", handler.GetUserRoles).Name("users.roles").WhereNumber("id")
+		auth.GET("/users/:id/roles", h.GetUserRoles).Name("users.roles").WhereNumber("id")
 
 		// Permissions
-		auth.GET("/permissions", handler.ListPermissions).Name("permissions.index")
+		auth.GET("/permissions", h.ListPermissions).Name("permissions.index")
 	})
 }

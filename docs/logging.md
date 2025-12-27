@@ -5,7 +5,7 @@ Eogo logging system supporting multiple channels, level control, and file rotati
 ## Quick Start
 
 ```go
-import "github.com/eogo-dev/eogo/internal/platform/logger"
+import "github.com/eogo-dev/eogo/internal/infra/logger"
 
 // Bootstrap (call once in main.go)
 logger.Boot()

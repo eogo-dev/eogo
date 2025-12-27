@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/eogo-dev/eogo/internal/platform/router"
+	"github.com/eogo-dev/eogo/internal/infra/router"
 	"github.com/gin-gonic/gin"
 )
 
