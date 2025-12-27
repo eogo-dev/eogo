@@ -1,83 +1,88 @@
 # EOGO 🚀
 **Evolving Orchestration for Go**
 
-Eogo is a modern, high-performance Go framework designed for an elite developer experience. It provides a "Vibe Enterprise" foundation for building robust, multi-tenant SaaS applications with zero friction.
+现代化高性能 Go 框架，专为企业级 SaaS 应用设计。
 
-![Eogo Banner](https://img.shields.io/badge/Vibe-Enterprise-blueviolet?style=for-the-badge)
-![Go Version](https://img.shields.io/badge/Go-1.23%2B-00ADD8?style=for-the-badge&logo=go)
-![Architecture](https://img.shields.io/badge/Arch-Modular-success?style=for-the-badge)
-
----
-
-## ✨ Features
-
-- **Modular Architecture**: Isolated domain modules (`user`, `org`, `team`) for clean scaling.
-- **Enterprise Core**: Pre-built multi-tenancy, RBAC, and API Key management.
-- **Developer First CLI**: High-performance generator (`eogo make:module`).
-- **Modern DI**: Type-safe dependency injection via Google Wire.
-- **Testing Suite**: Comprehensive support for Unit, Integration, and Feature tests.
-
-### Monitoring & Observability
-- **[Monitor Dashboard](http://localhost:8025/monitor)**: Built-in health and stats monitoring.
+![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=for-the-badge&logo=go)
+![Architecture](https://img.shields.io/badge/Arch-DDD-success?style=for-the-badge)
 
 ---
 
-## Documentation
+## ✨ 特性
 
-- [Usage & Configuration](docs/usage_and_config.md)
-- [Dependency Injection (Wire)](docs/dependency_injection.md) - Provider pattern similar to NestJS
-- [Production Logging](docs/production_logging.md) - ClickHouse & Sentry integration
-- [API Documentation](docs/api/)
-
----
-
-## 🚀 Quick Start
-
-### 1. Requirements
-- Go 1.23+
-- PostgreSQL (optional, defaults to SQLite for quick start)
-- Redis (optional)
-
-### 2. Installation
-```bash
-# Clone the repository
-git clone https://github.com/eogo-dev/eogo.git
-cd eogo
-
-# Configure environment
-cp .env.example .env
-
-# Run migrations
-make migrate
-```
-
-### 3. Run Development Server
-```bash
-make air
-```
-Visit: `http://localhost:8025`
+- **领域驱动设计 (DDD)**: 清晰的领域层 + 模块化业务
+- **企业级基础设施**: 熔断器、限流器、链路追踪、配置热更新
+- **开发者优先**: CLI 代码生成、Wire 依赖注入、完善测试
+- **生产就绪**: CI/CD、代码质量检查、OpenAPI 文档
 
 ---
 
-## 📂 Project Structure
+## 📂 项目结构
 
 ```text
-├── cmd/eogo              # Framework CLI
+eogo/
+├── cmd/
+│   ├── eogo/              # CLI 工具
+│   └── server/            # HTTP 服务入口
 ├── internal/
-│   ├── bootstrap/        # Lifecycle & Kernels
-│   ├── modules/          # Business Domains (User, Org, Team)
-│   └── platform/         # Framework Core (DB, Cache, Router)
-├── routes/               # Global Route Definitions
-└── tests/                # Integrated Test Platform
+│   ├── bootstrap/         # 应用启动与生命周期
+│   ├── domain/            # 核心领域实体 (DDD)
+│   ├── modules/           # 业务模块 (user, permission, llm)
+│   ├── infra/             # 基础设施 (33+ 组件)
+│   │   ├── breaker/       # 熔断器
+│   │   ├── ratelimit/     # 限流器 (内存/Redis)
+│   │   ├── config/        # 配置管理 (热更新)
+│   │   ├── tracing/       # OpenTelemetry
+│   │   └── ...
+│   └── wiring/            # Wire 依赖注入
+├── pkg/                   # 可复用公共库
+├── routes/                # 路由注册
+├── tests/                 # 测试 (unit/integration/e2e)
+├── docs/                  # 文档
+└── .github/workflows/     # CI/CD
 ```
 
 ---
 
-## 🏗️ Development SOP
+## 🚀 快速开始
 
-- **Add Feature**: `./eogo make:module NewFeature`
-- **Add Migration**: Add model to `internal/bootstrap/migrate.go`.
-- **Run Tests**: `make test`
+```bash
+# 克隆并配置
+git clone https://github.com/eogo-dev/eogo.git && cd eogo
+cp .env.example .env
+
+# 安装依赖
+go mod download
+
+# 启动开发服务器
+make air
+```
+
+访问: `http://localhost:8025`
+
+---
+
+## �️ 常用命令
+
+```bash
+make help          # 查看所有命令
+make build         # 构建 CLI
+make test          # 运行测试
+make lint          # 代码检查
+make cover         # 覆盖率报告
+make wire          # 生成依赖注入
+make docs          # 生成 API 文档
+```
+
+---
+
+## 📖 文档
+
+- [开发指南](docs/guide/README.md)
+- [模块开发](internal/modules/README.md)
+- [依赖注入 (Wire)](docs/dependency_injection.md)
+- [AI 协作指南](AGENTS.md)
+- [API 文档](docs/api/)
 
 ---
 
