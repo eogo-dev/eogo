@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/env"
+	"github.com/eogo-dev/eogo/pkg/env"
 )
 
 // Repository is the main configuration storage and management tool
