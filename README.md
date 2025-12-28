@@ -1,7 +1,10 @@
-# EOGO 🚀
-**Evolving Orchestration for Go**
+# Eogo 🚀
 
-A modern, high-performance Go framework designed for enterprise-grade SaaS applications.
+**Enterprise Orchestration in Go**
+
+The Orchestrable Go Framework for the Intelligent Era.
+
+[![Website](https://img.shields.io/badge/Website-eogo.dev-blue?style=for-the-badge)](https://eogo.dev)
 
 ![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=for-the-badge&logo=go)
 ![Architecture](https://img.shields.io/badge/Arch-DDD-success?style=for-the-badge)
