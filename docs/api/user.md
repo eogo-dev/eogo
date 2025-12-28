@@ -1,504 +1,101 @@
-# User API
-
-> Generated: 2025-12-25 17:34:47
-
-## Base URL
-
-See [API Documentation](./api.md) for environment-specific base URLs.
-
-## Endpoints
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/v1/register` | Create user account | 🔓 |
-| `POST` | `/v1/login` | Authenticate user | 🔓 |
-| `POST` | `/v1/password/reset` | Request password reset | 🔓 |
-| `GET` | `/v1/users/profile` | Get user profile | 🔒 |
-| `PUT` | `/v1/users/profile` | Update user profile | 🔒 |
-| `PUT` | `/v1/users/password` | Change user password | 🔒 |
-| `DELETE` | `/v1/users/account` | Delete user account | 🔒 |
-| `GET` | `/v1/users` | List all users | 🔒 |
-| `GET` | `/v1/users/:id` | Get user by ID | 🔒 |
-| `GET` | `/v1/users/:id/info` | Get user info | 🔒 |
-
----
-
-## Details
-
-### POST `/v1/register`
-
-**Create user account**
-
-Registers a new user with required fields: username, password, and email. Optional fields include nickname and phone. No authentication required.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔓 Not required |
-| Route Name | `v1.auth.register` |
-
-#### Request Body
-
-```json
-{
-  "email": "user@example.com",
-  "nickname": "John Doe",
-  "password": "********",
-  "phone": "+1234567890",
-  "username": "John Doe"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|:--------:|-------------|
-| `username` | `string` | ✅ | Required, Min: 3, Max: 50 |
-| `password` | `string` | ✅ | Required, Min: 6, Max: 50 |
-| `email` | `string` | ✅ | Required, Email format |
-| `nickname` | `string` | ❌ | Max: 50 |
-| `phone` | `string` | ❌ | Max: 20 |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X POST 'http://localhost:6066/api/v1/v1/register' \
-  -H 'Content-Type: application/json' \
-  -d '{"email": "user@example.com","nickname": "John Doe","password": "********","phone": "+1234567890","username": "John Doe"}'
-```
-
----
-
-### POST `/v1/login`
-
-**Authenticate user**
-
-Logs in a user by validating username and password, returning an authentication token upon success. No authentication required.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔓 Not required |
-| Route Name | `v1.auth.login` |
-
-#### Request Body
-
-```json
-{
-  "password": "********",
-  "username": "John Doe"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|:--------:|-------------|
-| `username` | `string` | ✅ | Required |
-| `password` | `string` | ✅ | Required |
-
-#### Response
-
-```json
-{
-  "token": "string",
-  "user": null
-}
-```
-
-#### Example
-
-```bash
-curl -X POST 'http://localhost:6066/api/v1/v1/login' \
-  -H 'Content-Type: application/json' \
-  -d '{"password": "********","username": "John Doe"}'
-```
-
----
-
-### POST `/v1/password/reset`
-
-**Request password reset**
-
-Initiates a password reset flow by sending a reset link to the registered email address. No authentication required.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔓 Not required |
-| Route Name | `v1.auth.password.reset` |
-
-#### Request Body
-
-```json
-{
-  "email": "user@example.com"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|:--------:|-------------|
-| `email` | `string` | ✅ | Required, Email format |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X POST 'http://localhost:6066/api/v1/v1/password/reset' \
-  -H 'Content-Type: application/json' \
-  -d '{"email": "user@example.com"}'
-```
-
----
-
-### GET `/v1/users/profile`
-
-**Get user profile**
-
-Retrieves the authenticated user's profile information. Requires valid authentication.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.profile` |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X GET 'http://localhost:6066/api/v1/v1/users/profile' \
-  -H 'Authorization: Bearer <token>'
-```
-
----
-
-### PUT `/v1/users/profile`
-
-**Update user profile**
-
-Updates the authenticated user's profile with provided fields such as nickname, avatar, phone, and bio. All fields are optional.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.profile.update` |
-
-#### Request Body
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "nickname": "John Doe",
-  "phone": "+1234567890"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|:--------:|-------------|
-| `nickname` | `string` | ❌ | Max: 50 |
-| `avatar` | `string` | ❌ | Max: 255 |
-| `phone` | `string` | ❌ | Max: 20 |
-| `bio` | `string` | ❌ | Max: 500 |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X PUT 'http://localhost:6066/api/v1/v1/users/profile' \
-  -H 'Authorization: Bearer <token>' \
-  -H 'Content-Type: application/json' \
-  -d '{"avatar": "https://example.com/avatar.jpg","bio": "string","nickname": "John Doe","phone": "+1234567890"}'
-```
-
----
-
-### PUT `/v1/users/password`
-
-**Change user password**
-
-Changes the authenticated user's password using the provided old and new passwords. Both fields are required.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.password.update` |
-
-#### Request Body
-
-```json
-{
-  "new_password": "********",
-  "old_password": "********"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|:--------:|-------------|
-| `old_password` | `string` | ✅ | Required |
-| `new_password` | `string` | ✅ | Required, Min: 6, Max: 50 |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X PUT 'http://localhost:6066/api/v1/v1/users/password' \
-  -H 'Authorization: Bearer <token>' \
-  -H 'Content-Type: application/json' \
-  -d '{"new_password": "********","old_password": "********"}'
-```
-
----
-
-### DELETE `/v1/users/account`
-
-**Delete user account**
-
-Permanently deletes the authenticated user's account. This action is irreversible and requires valid authentication.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.account.delete` |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X DELETE 'http://localhost:6066/api/v1/v1/users/account' \
-  -H 'Authorization: Bearer <token>'
-```
-
----
-
-### GET `/v1/users`
-
-**List all users**
-
-Retrieves a list of all registered users. Accessible only to authenticated users with appropriate permissions.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.index` |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X GET 'http://localhost:6066/api/v1/v1/users' \
-  -H 'Authorization: Bearer <token>'
-```
-
----
-
-### GET `/v1/users/:id`
-
-**Get user by ID**
-
-Retrieves the details of a specific user using their unique identifier. Authentication is required to access this endpoint.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.show` |
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | `integer` | Resource identifier |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X GET 'http://localhost:6066/api/v1/v1/users/1' \
-  -H 'Authorization: Bearer <token>'
-```
-
----
-
-### GET `/v1/users/:id/info`
-
-**Get user info**
-
-Fetches extended information about a user identified by their user ID. This endpoint requires authentication and provides supplementary user data.
-
-| Property | Value |
-|----------|-------|
-| Auth | 🔒 JWT Required |
-| Route Name | `v1.users.info` |
-
-#### Path Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | `integer` | Resource identifier |
-
-#### Response
-
-```json
-{
-  "avatar": "https://example.com/avatar.jpg",
-  "bio": "string",
-  "created_at": "2024-01-01T00:00:00Z",
-  "deleted_at": "object",
-  "email": "user@example.com",
-  "id": 1,
-  "last_login": "2024-01-01T00:00:00Z",
-  "nickname": "John Doe",
-  "phone": "+1234567890",
-  "status": 1,
-  "updated_at": "2024-01-01T00:00:00Z",
-  "username": "John Doe"
-}
-```
-
-#### Example
-
-```bash
-curl -X GET 'http://localhost:6066/api/v1/v1/users/1/info' \
-  -H 'Authorization: Bearer <token>'
-```
-
----
-
+// @Summary User registration
+// @Description Create a new user account with the provided registration information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body UserRegisterRequest true "Registration info"
+// @Success 200 {object} User "User registered successfully"
+// @Failure 400 {object} response.Response "Invalid request parameters or registration failed"
+// @Router /users/register [post]
+
+// @Summary User login
+// @Description Authenticate user and return access token upon successful login
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body UserLoginRequest true "Login credentials"
+// @Success 200 {object} User "Login successful, returns user data and token"
+// @Failure 400 {object} response.Response "Invalid request or login failed"
+// @Router /users/login [post]
+
+// @Summary Update user profile
+// @Description Update the currently authenticated user's profile information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body UserUpdateRequest true "User profile update data"
+// @Success 200 {object} User "Profile updated successfully"
+// @Failure 400 {object} response.Response "Invalid request or update failed"
+// @Failure 401 {object} response.Response "Unauthorized, user not authenticated"
+// @Router /users/profile [put]
+
+// @Summary Change password
+// @Description Change the currently authenticated user's password
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body UserChangePasswordRequest true "Current and new password"
+// @Success 200 {object} response.Response "Password changed successfully"
+// @Failure 400 {object} response.Response "Invalid request or password change failed"
+// @Failure 401 {object} response.Response "Unauthorized, user not authenticated"
+// @Router /users/password [put]
+
+// @Summary Reset password
+// @Description Send a password reset email to the user's registered email address
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body UserPasswordResetRequest true "Email address for reset"
+// @Success 200 {object} response.Response "Password reset email sent"
+// @Failure 400 {object} response.Response "Invalid request or reset failed"
+// @Router /users/password/reset [post]
+
+// @Summary Get user profile
+// @Description Retrieve the currently authenticated user's profile information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} User "User profile retrieved successfully"
+// @Failure 401 {object} response.Response "Unauthorized, missing or invalid authentication"
+// @Failure 500 {object} response.Response "Internal server error while retrieving profile"
+// @Router /users/profile [get]
+
+// @Summary Delete account
+// @Description Permanently delete the currently authenticated user's account
+// @Tags users
+// @Success 200 {object} response.Response "Account deleted successfully"
+// @Failure 401 {object} response.Response "Unauthorized, user not authenticated"
+// @Failure 400 {object} response.Response "Failed to delete account"
+// @Router /users/account [delete]
+
+// @Summary Get user by ID
+// @Description Retrieve user information by unique user ID
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} User "User found and returned successfully"
+// @Failure 400 {object} response.Response "Invalid user ID format"
+// @Failure 404 {object} response.Response "User not found"
+// @Router /users/{id} [get]
+
+// @Summary Get user list
+// @Description Retrieve a paginated list of users
+// @Tags users
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param page_size query int false "Number of users per page" default(10)
+// @Success 200 {object} response.Response "Returns paginated list of users with total count"
+// @Failure 500 {object} response.Response "Internal server error while fetching user list"
+// @Router /users [get]
+
+// @Summary Get user info
+// @Description Retrieve detailed user information by user ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} UserInfo "User info retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid user ID format"
+// @Failure 404 {object} response.Response "User not found"
+// @Router /users/info/{id} [get]

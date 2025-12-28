@@ -2,9 +2,11 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/eogo-dev/eogo/internal/infra/console"
 	"github.com/eogo-dev/eogo/internal/infra/console/commands"
+	"github.com/eogo-dev/eogo/internal/infra/plugin"
 )
 
 const Version = "1.0.0"
@@ -15,6 +17,18 @@ func main() {
 
 	// Register Commands
 	registerCommands(cli)
+
+	// Check if first argument is a plugin command
+	if len(os.Args) > 1 && isPluginCommand(os.Args[1]) {
+		pluginName := os.Args[1]
+		pluginArgs := os.Args[2:]
+
+		// Execute plugin
+		if err := plugin.Execute(pluginName, pluginArgs); err != nil {
+			os.Exit(1)
+		}
+		return
+	}
 
 	// Handle Command
 	if err := cli.Run(os.Args); err != nil {
@@ -58,4 +72,48 @@ func registerCommands(app *console.Application) {
 	app.Register(commands.NewEnvCommand())
 	app.Register(commands.NewVersionCommand(Version))
 	app.Register(commands.NewRouteListCommand())
+
+	// Register plugin commands
+	app.Register(commands.NewPluginListCommand())
+}
+
+// isPluginCommand checks if a command is a plugin command
+func isPluginCommand(cmd string) bool {
+	// Skip if it's a known core command
+	coreCommands := map[string]bool{
+		"make:model":       true,
+		"make:service":     true,
+		"make:handler":     true,
+		"make:repository":  true,
+		"make:seeder":      true,
+		"make:migration":   true,
+		"make:module":      true,
+		"migrate":          true,
+		"migrate:fresh":    true,
+		"migrate:rollback": true,
+		"migrate:status":   true,
+		"seed":             true,
+		"serve":            true,
+		"env":              true,
+		"version":          true,
+		"route:list":       true,
+		"plugin:list":      true,
+		"help":             true,
+	}
+
+	if coreCommands[cmd] {
+		return false
+	}
+
+	// Check if it starts with a known prefix
+	if strings.HasPrefix(cmd, "make:") ||
+		strings.HasPrefix(cmd, "migrate:") ||
+		strings.HasPrefix(cmd, "db:") ||
+		strings.HasPrefix(cmd, "route:") ||
+		strings.HasPrefix(cmd, "plugin:") {
+		return false
+	}
+
+	// Check if plugin exists
+	return plugin.IsInstalled(cmd)
 }
