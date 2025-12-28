@@ -3,7 +3,9 @@ package app
 import (
 	"github.com/eogo-dev/eogo/internal/infra/config"
 	"github.com/eogo-dev/eogo/internal/infra/email"
+	"github.com/eogo-dev/eogo/internal/infra/events"
 	"github.com/eogo-dev/eogo/internal/infra/jwt"
+	"github.com/eogo-dev/eogo/internal/infra/migration"
 	"github.com/eogo-dev/eogo/internal/modules/permission"
 	"github.com/eogo-dev/eogo/internal/modules/user"
 	"gorm.io/gorm"
@@ -16,6 +18,8 @@ type Application struct {
 	DB           *gorm.DB
 	JWTService   *jwt.Service
 	EmailService *email.Service
+	EventBus     *events.EventBus
+	Migrator     *migration.Migrator
 	Handlers     *Handlers
 }
 

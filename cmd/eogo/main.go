@@ -46,23 +46,28 @@ func registerCommands(app *console.Application) {
 	app.Register(commands.NewMakeMigrationCommand())
 	app.Register(commands.NewMakeModuleCommand())
 
-	// Register database commands
-	dbMigrate := commands.NewDBMigrateCommand()
+	// Register database migration commands (new Migrator-based)
+	dbMigrate := commands.NewMigrateCommand()
 	app.Register(dbMigrate)
 	app.RegisterAs("migrate", dbMigrate)
 
-	dbFresh := commands.NewDBFreshCommand()
+	dbFresh := commands.NewFreshCommand()
 	app.Register(dbFresh)
 	app.RegisterAs("migrate:fresh", dbFresh)
 
-	dbRollback := commands.NewDBRollbackCommand()
+	dbRollback := commands.NewRollbackCommand()
 	app.Register(dbRollback)
 	app.RegisterAs("migrate:rollback", dbRollback)
 
-	dbStatus := commands.NewDBStatusCommand()
+	dbReset := commands.NewResetCommand()
+	app.Register(dbReset)
+	app.RegisterAs("migrate:reset", dbReset)
+
+	dbStatus := commands.NewStatusCommand()
 	app.Register(dbStatus)
 	app.RegisterAs("migrate:status", dbStatus)
 
+	// Register seed command
 	dbSeed := commands.NewDBSeedCommand()
 	app.Register(dbSeed)
 	app.RegisterAs("seed", dbSeed)
@@ -91,7 +96,14 @@ func isPluginCommand(cmd string) bool {
 		"migrate":          true,
 		"migrate:fresh":    true,
 		"migrate:rollback": true,
+		"migrate:reset":    true,
 		"migrate:status":   true,
+		"db:migrate":       true,
+		"db:fresh":         true,
+		"db:rollback":      true,
+		"db:reset":         true,
+		"db:status":        true,
+		"db:seed":          true,
 		"seed":             true,
 		"serve":            true,
 		"env":              true,

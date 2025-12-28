@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/eogo-dev/eogo/internal/infra/console"
+	"github.com/eogo-dev/eogo/internal/infra/migration"
 )
 
 // MakeModelCommand creates a new model
@@ -205,20 +206,92 @@ func (c *MakeSeederCommand) Run(args []string) error {
 	return nil
 }
 
-// MakeMigrationCommand creates a new migration
+// MakeMigrationCommand creates a new migration using the migration Creator.
 type MakeMigrationCommand struct {
 	output *console.Output
 }
 
+// NewMakeMigrationCommand creates a new MakeMigrationCommand instance.
 func NewMakeMigrationCommand() *MakeMigrationCommand {
 	return &MakeMigrationCommand{output: console.NewOutput()}
 }
 
 func (c *MakeMigrationCommand) Name() string        { return "make:migration" }
 func (c *MakeMigrationCommand) Description() string { return "Create a new database migration" }
-func (c *MakeMigrationCommand) Usage() string       { return "make:migration <name>" }
+func (c *MakeMigrationCommand) Usage() string {
+	return "make:migration <name> [--create=table] [--table=table]"
+}
 
 func (c *MakeMigrationCommand) Run(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("migration name is required")
+	}
+
+	// Parse migration name (first non-flag argument)
+	var name string
+	var createTable string
+	var modifyTable string
+
+	for i, arg := range args {
+		// Parse --create=table flag
+		if val, found := strings.CutPrefix(arg, "--create="); found {
+			createTable = val
+			continue
+		}
+		if arg == "--create" && i+1 < len(args) && !strings.HasPrefix(args[i+1], "--") {
+			createTable = args[i+1]
+			continue
+		}
+
+		// Parse --table=table flag
+		if val, found := strings.CutPrefix(arg, "--table="); found {
+			modifyTable = val
+			continue
+		}
+		if arg == "--table" && i+1 < len(args) && !strings.HasPrefix(args[i+1], "--") {
+			modifyTable = args[i+1]
+			continue
+		}
+
+		// First non-flag argument is the migration name
+		if !strings.HasPrefix(arg, "--") && name == "" {
+			name = arg
+		}
+	}
+
+	if name == "" {
+		return fmt.Errorf("migration name is required")
+	}
+
+	// Use the migration Creator
+	creator := migration.NewCreator("database/migrations")
+
+	opts := migration.CreatorOptions{
+		Create: createTable,
+		Table:  modifyTable,
+	}
+
+	result, err := creator.Create(name, opts)
+	if err != nil {
+		return err
+	}
+
+	c.output.Success("Migration created: %s", result.Path)
+	c.output.Info("Migration ID: %s", result.Name)
+
+	// Show helpful hints based on migration type
+	if createTable != "" {
+		c.output.Info("Table: %s (create)", createTable)
+	} else if modifyTable != "" {
+		c.output.Info("Table: %s (modify)", modifyTable)
+	}
+
+	return nil
+}
+
+// legacyMakeMigrationCommand is kept for backward compatibility reference.
+// It uses the old gormigrate-style template.
+func legacyMakeMigrationCommand(args []string, output *console.Output) error {
 	if len(args) < 1 {
 		return fmt.Errorf("migration name is required")
 	}
@@ -246,14 +319,14 @@ func (c *MakeMigrationCommand) Run(args []string) error {
 	// Migration ID
 	migrationID := fmt.Sprintf("%s_%s", timestamp, name)
 
-	if err := generateFile(filePath, migrationTemplate, map[string]string{
+	if err := generateFile(filePath, legacyMigrationTemplate, map[string]string{
 		"MigrationID": migrationID,
 	}); err != nil {
 		return err
 	}
 
-	c.output.Success("Migration created: %s", filePath)
-	c.output.Info("Migration ID: %s", migrationID)
+	output.Success("Migration created: %s", filePath)
+	output.Info("Migration ID: %s", migrationID)
 	return nil
 }
 
@@ -767,7 +840,9 @@ func init() {
 }
 `
 
-const migrationTemplate = `package migrations
+// legacyMigrationTemplate is the old gormigrate-style template.
+// Kept for backward compatibility reference.
+const legacyMigrationTemplate = `package migrations
 
 import (
 	"github.com/go-gormigrate/gormigrate/v2"

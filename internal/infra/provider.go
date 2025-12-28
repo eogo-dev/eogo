@@ -4,7 +4,9 @@ import (
 	"github.com/eogo-dev/eogo/internal/infra/config"
 	"github.com/eogo-dev/eogo/internal/infra/database"
 	"github.com/eogo-dev/eogo/internal/infra/email"
+	"github.com/eogo-dev/eogo/internal/infra/events"
 	"github.com/eogo-dev/eogo/internal/infra/jwt"
+	"github.com/eogo-dev/eogo/internal/infra/migration"
 	"github.com/google/wire"
 )
 
@@ -22,4 +24,10 @@ var ProviderSet = wire.NewSet(
 
 	// Email Service - depends on Config
 	email.NewService,
+
+	// Event Bus
+	events.NewEventBus,
+
+	// Migration - depends on Database and EventBus
+	migration.ProviderSet,
 )

@@ -11,7 +11,9 @@ import (
 	"github.com/eogo-dev/eogo/internal/infra/config"
 	"github.com/eogo-dev/eogo/internal/infra/database"
 	"github.com/eogo-dev/eogo/internal/infra/email"
+	"github.com/eogo-dev/eogo/internal/infra/events"
 	"github.com/eogo-dev/eogo/internal/infra/jwt"
+	"github.com/eogo-dev/eogo/internal/infra/migration"
 	"github.com/eogo-dev/eogo/internal/modules/permission"
 	"github.com/eogo-dev/eogo/internal/modules/user"
 )
@@ -31,8 +33,11 @@ func InitApplication() (*app.Application, error) {
 	}
 	service := jwt.NewService(configConfig)
 	emailService := email.NewService(configConfig)
-	repository := user.NewRepository(db)
-	userService := user.NewService(repository, service)
+	eventBus := events.NewEventBus()
+	repository := migration.NewDatabaseRepositoryProvider(db)
+	migrator := migration.NewMigratorProvider(repository, db, eventBus)
+	userRepository := user.NewRepository(db)
+	userService := user.NewService(userRepository, service)
 	handler := user.NewHandler(userService)
 	permissionRepository := permission.NewRepository(db)
 	permissionService := permission.NewService(permissionRepository)
@@ -46,6 +51,8 @@ func InitApplication() (*app.Application, error) {
 		DB:           db,
 		JWTService:   service,
 		EmailService: emailService,
+		EventBus:     eventBus,
+		Migrator:     migrator,
 		Handlers:     handlers,
 	}
 	return application, nil
