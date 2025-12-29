@@ -95,3 +95,7 @@ _reference/
 .ref
 # Reference code
 .ref/
+
+# Built binaries
+zgo
+server
