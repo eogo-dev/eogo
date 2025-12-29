@@ -130,6 +130,16 @@ vuln:
 	@which govulncheck > /dev/null || (echo "Installing govulncheck..." && go install golang.org/x/vuln/cmd/govulncheck@latest)
 	govulncheck ./...
 
+# Setup development environment
+setup:
+	@echo "Setting up development environment..."
+	@go mod download
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/*
+	@echo "✅ Git hooks configured"
+	@echo "✅ Dependencies downloaded"
+	@echo "Run 'make install' to install zgo CLI globally"
+
 # Show help
 help:
 	@echo "Available targets:"
