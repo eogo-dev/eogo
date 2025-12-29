@@ -453,3 +453,90 @@ func New[T any](c *gin.Context, db *gorm.DB) ([]T, *Paginator[T], error) {
 func NewWithScope[T any](c *gin.Context, db *gorm.DB, scope func(*gorm.DB) *gorm.DB) ([]T, *Paginator[T], error) {
 	return New[T](c, scope(db.Model(new(T))))
 }
+
+// ============================================================================
+// Simple API (AI-Friendly / Vibe Coding)
+// ============================================================================
+
+// Auto creates a paginator with automatic path and query setup.
+// This is the simplest way to paginate - just pass gin.Context and GORM query.
+//
+// Example (Handler - just 2 lines!):
+//
+//	func (h *Handler) List(c *gin.Context) {
+//	    paginator, err := pagination.Auto(c, h.db.Model(&User{}))
+//	    if err != nil {
+//	        response.HandleError(c, "Failed to list", err)
+//	        return
+//	    }
+//	    response.Success(c, paginator)
+//	}
+func Auto[T any](c *gin.Context, db *gorm.DB) (*Paginator[T], error) {
+	_, paginator, err := New[T](c, db)
+	return paginator, err
+}
+
+// AutoWithScope creates a paginator with scope and automatic setup.
+//
+// Example:
+//
+//	paginator, err := pagination.AutoWithScope[User](c, h.db, func(db *gorm.DB) *gorm.DB {
+//	    return db.Where("status = ?", "active").Order("created_at DESC")
+//	})
+func AutoWithScope[T any](c *gin.Context, db *gorm.DB, scope func(*gorm.DB) *gorm.DB) (*Paginator[T], error) {
+	_, paginator, err := NewWithScope[T](c, db, scope)
+	return paginator, err
+}
+
+// ============================================================================
+// Service Layer Helper
+// ============================================================================
+
+// Result wraps paginated data for service layer returns.
+// Use this when service needs to return paginated data to handler.
+//
+// Example (Service):
+//
+//	func (s *service) List(ctx context.Context, page, perPage int) (*pagination.Result[*domain.User], error) {
+//	    users, total, err := s.repo.FindAll(ctx, page, perPage)
+//	    if err != nil {
+//	        return nil, err
+//	    }
+//	    return pagination.NewResult(users, total, page, perPage), nil
+//	}
+//
+// Example (Handler):
+//
+//	func (h *Handler) List(c *gin.Context) {
+//	    req := pagination.FromContext(c)
+//	    result, err := h.service.List(c.Request.Context(), req.GetPage(), req.GetPerPage())
+//	    if err != nil {
+//	        response.HandleError(c, "Failed to list", err)
+//	        return
+//	    }
+//	    response.Success(c, result.ToPaginator(c))
+//	}
+type Result[T any] struct {
+	Items   []T
+	Total   int64
+	Page    int
+	PerPage int
+}
+
+// NewResult creates a pagination result from service layer.
+func NewResult[T any](items []T, total int64, page, perPage int) *Result[T] {
+	return &Result[T]{
+		Items:   items,
+		Total:   total,
+		Page:    page,
+		PerPage: perPage,
+	}
+}
+
+// ToPaginator converts Result to Paginator with path from gin.Context.
+func (r *Result[T]) ToPaginator(c *gin.Context) *Paginator[T] {
+	p := NewPaginator(r.Items, r.Total, r.Page, r.PerPage)
+	p.SetPath(c.Request.URL.Path)
+	p.WithQuery(c.Request.URL.Query())
+	return p
+}

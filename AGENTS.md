@@ -129,21 +129,42 @@ response.Transform(c, user, func(u *User) any {
 ```go
 import "github.com/eogo-dev/eogo/pkg/pagination"
 
-// Simple pagination - just pass paginator to Success()
-users, paginator, err := pagination.New[User](c, db.Model(&User{}))
-response.Success(c, paginator)  // Auto-outputs data + meta + links
+// ========== 方式1: Handler 直接查询 (最简单，AI推荐) ==========
+func (h *Handler) List(c *gin.Context) {
+    // 一行搞定！自动处理 page, per_page, path, query
+    paginator, err := pagination.Auto[*domain.User](c, h.db.Model(&UserPO{}))
+    if err != nil {
+        response.HandleError(c, "Failed to list", err)
+        return
+    }
+    response.Success(c, paginator)  // 自动输出 data + meta + links
+}
 
-// With custom scope
-users, paginator, err := pagination.NewWithScope[User](c, db, func(db *gorm.DB) *gorm.DB {
+// 带条件查询
+paginator, err := pagination.AutoWithScope[*domain.User](c, h.db, func(db *gorm.DB) *gorm.DB {
     return db.Where("status = ?", "active").Order("created_at DESC")
 })
-response.Success(c, paginator)
 
-// Manual pagination
-req := pagination.FromContext(c)
-users, total, _ := service.List(ctx, req.GetPage(), req.GetPerPage())
-paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage())
-response.Success(c, paginator)
+// ========== 方式2: 通过 Service 层 (DDD标准) ==========
+// Service:
+func (s *service) List(ctx context.Context, page, perPage int) (*pagination.Result[*domain.User], error) {
+    users, total, err := s.repo.FindAll(ctx, page, perPage)
+    if err != nil {
+        return nil, err
+    }
+    return pagination.NewResult(users, total, page, perPage), nil
+}
+
+// Handler:
+func (h *Handler) List(c *gin.Context) {
+    req := pagination.FromContext(c)
+    result, err := h.service.List(c.Request.Context(), req.GetPage(), req.GetPerPage())
+    if err != nil {
+        response.HandleError(c, "Failed to list", err)
+        return
+    }
+    response.Success(c, result.ToPaginator(c))  // 自动设置 path 和 query
+}
 ```
 
 ## Complete Handler Example
@@ -174,18 +195,25 @@ func (h *Handler) Get(c *gin.Context) {
     response.Success(c, user)  // Domain直接输出
 }
 
-// List - paginated
+// List - paginated (最简方式)
 func (h *Handler) List(c *gin.Context) {
-    req := pagination.FromContext(c)
-    users, total, err := h.service.List(c.Request.Context(), req.GetPage(), req.GetPerPage())
+    paginator, err := pagination.Auto[*domain.User](c, h.db.Model(&UserPO{}))
     if err != nil {
         response.HandleError(c, "Failed to list", err)
         return
     }
+    response.Success(c, paginator)
+}
 
-    paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage())
-    paginator.SetPath(c.Request.URL.Path)
-    response.Success(c, paginator)  // 自动输出 data + meta + links
+// List - 通过 Service (DDD标准)
+func (h *Handler) ListViaService(c *gin.Context) {
+    req := pagination.FromContext(c)
+    result, err := h.service.List(c.Request.Context(), req.GetPage(), req.GetPerPage())
+    if err != nil {
+        response.HandleError(c, "Failed to list", err)
+        return
+    }
+    response.Success(c, result.ToPaginator(c))
 }
 
 // Create - with binding
