@@ -57,19 +57,48 @@ make air           # Hot-reload dev server
 
 ## Domain Layer
 
-`internal/domain/` contains core business entities:
+`internal/domain/` contains core business entities with JSON tags:
 
 ```go
 // internal/domain/user.go
 type User struct {
-    ID        uint
-    Username  string
-    Email     string
-    Password  string
+    ID        uint       `json:"id"`
+    Username  string     `json:"username"`
+    Email     string     `json:"email"`
+    Password  string     `json:"-"`  // Always hidden!
+    CreatedAt time.Time  `json:"created_at"`
 }
 ```
 
 **Data Flow**: `Handler(DTO) → Service(domain.User) → Repository(UserPO)`
+
+## Handler Utilities
+
+```go
+import "github.com/eogo-dev/eogo/pkg/handler"
+
+// Parse URL parameters (auto sends error response)
+id, ok := handler.ParseID(c, "id")
+if !ok {
+    return  // 400 already sent
+}
+
+// Get authenticated user (auto sends 401)
+userID, ok := handler.GetUserID(c)
+if !ok {
+    return  // 401 already sent
+}
+
+// Bind JSON request (auto sends error response)
+var req CreateRequest
+if !handler.BindJSON(c, &req) {
+    return  // 400 already sent
+}
+
+// Query helpers
+page := handler.QueryInt(c, "page", 1)
+active := handler.QueryBool(c, "active", true)
+```
 
 ## Unified Response
 
@@ -117,6 +146,86 @@ paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage
 response.Success(c, paginator)
 ```
 
+## Complete Handler Example
+
+```go
+package user
+
+import (
+    "github.com/eogo-dev/eogo/pkg/handler"
+    "github.com/eogo-dev/eogo/pkg/pagination"
+    "github.com/eogo-dev/eogo/pkg/response"
+    "github.com/gin-gonic/gin"
+)
+
+// Get - single resource
+func (h *Handler) Get(c *gin.Context) {
+    id, ok := handler.ParseID(c, "id")
+    if !ok {
+        return
+    }
+
+    user, err := h.service.GetByID(c.Request.Context(), id)
+    if err != nil {
+        response.HandleError(c, "User not found", err)
+        return
+    }
+
+    response.Success(c, user)  // Domain直接输出
+}
+
+// List - paginated
+func (h *Handler) List(c *gin.Context) {
+    req := pagination.FromContext(c)
+    users, total, err := h.service.List(c.Request.Context(), req.GetPage(), req.GetPerPage())
+    if err != nil {
+        response.HandleError(c, "Failed to list", err)
+        return
+    }
+
+    paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage())
+    paginator.SetPath(c.Request.URL.Path)
+    response.Success(c, paginator)  // 自动输出 data + meta + links
+}
+
+// Create - with binding
+func (h *Handler) Create(c *gin.Context) {
+    var req CreateRequest
+    if !handler.BindJSON(c, &req) {
+        return
+    }
+
+    user, err := h.service.Create(c.Request.Context(), &req)
+    if err != nil {
+        response.HandleError(c, "Create failed", err)
+        return
+    }
+
+    response.Created(c, user)
+}
+
+// Update - authenticated user
+func (h *Handler) UpdateProfile(c *gin.Context) {
+    userID, ok := handler.GetUserID(c)
+    if !ok {
+        return
+    }
+
+    var req UpdateRequest
+    if !handler.BindJSON(c, &req) {
+        return
+    }
+
+    user, err := h.service.Update(c.Request.Context(), userID, &req)
+    if err != nil {
+        response.HandleError(c, "Update failed", err)
+        return
+    }
+
+    response.Success(c, user)
+}
+```
+
 ## Wire Dependency Injection
 
 ```go
@@ -150,6 +259,8 @@ Run `cd internal/wiring && wire` to generate code.
 4. **Constructors return interfaces** - `NewService() Service`
 5. **snake_case JSON** - `json:"user_id"`
 6. **English comments** - All code and comments in English
+7. **Use handler package** - For ParseID, GetUserID, BindJSON
+8. **Domain has JSON tags** - Sensitive fields use `json:"-"`
 
 ## Testing
 

@@ -1,8 +1,7 @@
 package user
 
 import (
-	"strconv"
-
+	"github.com/eogo-dev/eogo/pkg/handler"
 	"github.com/eogo-dev/eogo/pkg/pagination"
 	"github.com/eogo-dev/eogo/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -25,8 +24,7 @@ func NewHandler(service Service) *Handler {
 // Register handles user registration
 func (h *Handler) Register(c *gin.Context) {
 	var req UserRegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request parameters", err)
+	if !handler.BindJSON(c, &req) {
 		return
 	}
 
@@ -36,14 +34,13 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	response.Created(c, user) // Domain直接输出，Password自动隐藏
+	response.Created(c, user)
 }
 
 // Login handles user login
 func (h *Handler) Login(c *gin.Context) {
 	var req UserLoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request parameters", err)
+	if !handler.BindJSON(c, &req) {
 		return
 	}
 
@@ -62,7 +59,7 @@ func (h *Handler) Login(c *gin.Context) {
 
 // GetProfile gets current user's profile
 func (h *Handler) GetProfile(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := handler.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -73,19 +70,18 @@ func (h *Handler) GetProfile(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, user) // 直接输出
+	response.Success(c, user)
 }
 
 // UpdateProfile updates current user's profile
 func (h *Handler) UpdateProfile(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := handler.GetUserID(c)
 	if !ok {
 		return
 	}
 
 	var req UserUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request parameters", err)
+	if !handler.BindJSON(c, &req) {
 		return
 	}
 
@@ -100,14 +96,13 @@ func (h *Handler) UpdateProfile(c *gin.Context) {
 
 // ChangePassword changes current user's password
 func (h *Handler) ChangePassword(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := handler.GetUserID(c)
 	if !ok {
 		return
 	}
 
 	var req UserChangePasswordRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request parameters", err)
+	if !handler.BindJSON(c, &req) {
 		return
 	}
 
@@ -121,7 +116,7 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 
 // DeleteAccount deletes current user's account
 func (h *Handler) DeleteAccount(c *gin.Context) {
-	userID, ok := h.getUserID(c)
+	userID, ok := handler.GetUserID(c)
 	if !ok {
 		return
 	}
@@ -141,8 +136,7 @@ func (h *Handler) DeleteAccount(c *gin.Context) {
 // ResetPassword initiates password reset
 func (h *Handler) ResetPassword(c *gin.Context) {
 	var req UserPasswordResetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid request parameters", err)
+	if !handler.BindJSON(c, &req) {
 		return
 	}
 
@@ -160,8 +154,8 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 
 // Get gets user by ID
 func (h *Handler) Get(c *gin.Context) {
-	id, err := h.parseID(c, "id")
-	if err != nil {
+	id, ok := handler.ParseID(c, "id")
+	if !ok {
 		return
 	}
 
@@ -171,7 +165,7 @@ func (h *Handler) Get(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, user) // 直接输出
+	response.Success(c, user)
 }
 
 // List gets paginated user list
@@ -187,40 +181,10 @@ func (h *Handler) List(c *gin.Context) {
 	paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage())
 	paginator.SetPath(c.Request.URL.Path)
 
-	response.Success(c, paginator) // 统一用 Success，自动检测分页！
+	response.Success(c, paginator)
 }
 
 // GetUserInfo gets detailed user info by ID (alias for Get)
 func (h *Handler) GetUserInfo(c *gin.Context) {
 	h.Get(c)
-}
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
-func (h *Handler) getUserID(c *gin.Context) (uint, bool) {
-	userIDVal, exists := c.Get("userID")
-	if !exists {
-		response.Unauthorized(c)
-		return 0, false
-	}
-
-	userID, ok := userIDVal.(uint)
-	if !ok {
-		response.InternalServerError(c, "Invalid user ID type", nil)
-		return 0, false
-	}
-
-	return userID, true
-}
-
-func (h *Handler) parseID(c *gin.Context, param string) (uint, error) {
-	idStr := c.Param(param)
-	id, err := strconv.ParseUint(idStr, 10, 64)
-	if err != nil {
-		response.BadRequest(c, "Invalid ID", err)
-		return 0, err
-	}
-	return uint(id), nil
 }
