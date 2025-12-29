@@ -13,18 +13,25 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Service defines the interface for user-related operations
+// Service defines the interface for user-related operations.
+// Returns domain.User - transformation to DTO happens in Handler.
 type Service interface {
-	Register(ctx context.Context, req *UserRegisterRequest) (*UserResponse, error)
+	// Authentication
+	Register(ctx context.Context, req *UserRegisterRequest) (*domain.User, error)
 	Login(ctx context.Context, req *UserLoginRequest) (*UserLoginResponse, error)
-	GetProfile(ctx context.Context, userID uint) (*UserResponse, error)
-	UpdateProfile(ctx context.Context, userID uint, req *UserUpdateRequest) (*UserResponse, error)
+
+	// Profile (authenticated user)
+	GetProfile(ctx context.Context, userID uint) (*domain.User, error)
+	UpdateProfile(ctx context.Context, userID uint, req *UserUpdateRequest) (*domain.User, error)
 	ChangePassword(ctx context.Context, userID uint, req *UserChangePasswordRequest) error
-	ResetPassword(ctx context.Context, req *UserPasswordResetRequest) error
 	DeleteAccount(ctx context.Context, userID uint) error
-	GetByID(ctx context.Context, id uint) (*UserResponse, error)
-	List(ctx context.Context, page, pageSize int) ([]*UserResponse, int64, error)
-	GetUserByID(ctx context.Context, id uint) (*UserInfo, error)
+
+	// Public
+	ResetPassword(ctx context.Context, req *UserPasswordResetRequest) error
+
+	// Admin/Query
+	GetByID(ctx context.Context, id uint) (*domain.User, error)
+	List(ctx context.Context, page, pageSize int) ([]*domain.User, int64, error)
 }
 
 // service implements the Service interface
@@ -41,31 +48,12 @@ func NewService(repo domain.UserRepository, jwtService *jwt.Service) *service {
 	}
 }
 
-// GetByID retrieves a user by ID
-func (s *service) GetByID(ctx context.Context, id uint) (*UserResponse, error) {
-	user, err := s.repo.FindByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return toUserResponse(user), nil
-}
-
-// List retrieves a paginated list of users
-func (s *service) List(ctx context.Context, page, pageSize int) ([]*UserResponse, int64, error) {
-	users, total, err := s.repo.FindAll(ctx, page, pageSize)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	var res []*UserResponse
-	for _, u := range users {
-		res = append(res, toUserResponse(u))
-	}
-	return res, total, nil
-}
+// ============================================================================
+// Authentication
+// ============================================================================
 
 // Register handles user registration
-func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*UserResponse, error) {
+func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*domain.User, error) {
 	// Check if email already exists
 	exists, err := s.repo.FindByEmail(ctx, req.Email)
 	if err == nil && exists != nil {
@@ -91,16 +79,19 @@ func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*User
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	// Send welcome email
-	if err := email.SendWelcomeEmail(user.Email, user.Username); err != nil {
-		logger.Error("failed to send welcome email:", map[string]any{"error": err})
-	}
+	// Send welcome email (async, don't block)
+	go func() {
+		if err := email.SendWelcomeEmail(user.Email, user.Username); err != nil {
+			logger.Error("failed to send welcome email", map[string]any{"error": err})
+		}
+	}()
 
-	return toUserResponse(user), nil
+	return user, nil
 }
 
 // Login handles user login
 func (s *service) Login(ctx context.Context, req *UserLoginRequest) (*UserLoginResponse, error) {
+	// Try username first, then email
 	user, err := s.repo.FindByUsername(ctx, req.Username)
 	if err != nil {
 		user, err = s.repo.FindByEmail(ctx, req.Username)
@@ -122,32 +113,38 @@ func (s *service) Login(ctx context.Context, req *UserLoginRequest) (*UserLoginR
 		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
+	// Update last login
 	now := time.Now()
 	user.LastLogin = &now
 	_ = s.repo.Update(ctx, user)
 
 	return &UserLoginResponse{
 		AccessToken: token,
-		User:        toUserResponseData(user),
+		User:        user, // Domain直接输出
 	}, nil
 }
 
+// ============================================================================
+// Profile (Authenticated User)
+// ============================================================================
+
 // GetProfile retrieves user profile
-func (s *service) GetProfile(ctx context.Context, userID uint) (*UserResponse, error) {
+func (s *service) GetProfile(ctx context.Context, userID uint) (*domain.User, error) {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
 		return nil, domain.ErrUserNotFound
 	}
-	return toUserResponse(user), nil
+	return user, nil
 }
 
 // UpdateProfile updates user profile
-func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UserUpdateRequest) (*UserResponse, error) {
+func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UserUpdateRequest) (*domain.User, error) {
 	user, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
 		return nil, domain.ErrUserNotFound
 	}
 
+	// Only update non-empty fields
 	if req.Nickname != "" {
 		user.Nickname = req.Nickname
 	}
@@ -165,7 +162,7 @@ func (s *service) UpdateProfile(ctx context.Context, userID uint, req *UserUpdat
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
-	return toUserResponse(user), nil
+	return user, nil
 }
 
 // ChangePassword changes user password
@@ -188,6 +185,15 @@ func (s *service) ChangePassword(ctx context.Context, userID uint, req *UserChan
 	return s.repo.Update(ctx, user)
 }
 
+// DeleteAccount deletes user account
+func (s *service) DeleteAccount(ctx context.Context, userID uint) error {
+	return s.repo.Delete(ctx, userID)
+}
+
+// ============================================================================
+// Public
+// ============================================================================
+
 // ResetPassword resets user password via email
 func (s *service) ResetPassword(ctx context.Context, req *UserPasswordResetRequest) error {
 	user, err := s.repo.FindByEmail(ctx, req.Email)
@@ -209,58 +215,16 @@ func (s *service) ResetPassword(ctx context.Context, req *UserPasswordResetReque
 	return email.SendPasswordResetEmail(user.Email, newPassword)
 }
 
-// DeleteAccount deletes user account
-func (s *service) DeleteAccount(ctx context.Context, userID uint) error {
-	return s.repo.Delete(ctx, userID)
+// ============================================================================
+// Admin/Query
+// ============================================================================
+
+// GetByID retrieves a user by ID
+func (s *service) GetByID(ctx context.Context, id uint) (*domain.User, error) {
+	return s.repo.FindByID(ctx, id)
 }
 
-// GetUserByID retrieves user information for monitor/profile
-func (s *service) GetUserByID(ctx context.Context, id uint) (*UserInfo, error) {
-	user, err := s.repo.FindByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return &UserInfo{
-		ID:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		Nickname:  user.Nickname,
-		Avatar:    user.Avatar,
-		Phone:     user.Phone,
-		Bio:       user.Bio,
-		Status:    user.Status,
-		LastLogin: user.LastLogin,
-	}, nil
-}
-
-// toUserResponse converts domain.User to UserResponse DTO
-func toUserResponse(user *domain.User) *UserResponse {
-	return &UserResponse{
-		ID:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		Nickname:  user.Nickname,
-		Avatar:    user.Avatar,
-		Phone:     user.Phone,
-		Bio:       user.Bio,
-		Status:    user.Status,
-		CreatedAt: user.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
-	}
-}
-
-// toUserResponseData converts domain.User to UserResponseData for login response
-func toUserResponseData(user *domain.User) *UserResponseData {
-	return &UserResponseData{
-		ID:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		Nickname:  user.Nickname,
-		Avatar:    user.Avatar,
-		Phone:     user.Phone,
-		Bio:       user.Bio,
-		Status:    user.Status,
-		LastLogin: user.LastLogin,
-	}
+// List retrieves a paginated list of users
+func (s *service) List(ctx context.Context, page, pageSize int) ([]*domain.User, int64, error) {
+	return s.repo.FindAll(ctx, page, pageSize)
 }

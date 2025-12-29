@@ -76,9 +76,23 @@ type User struct {
 ```go
 import "github.com/eogo-dev/eogo/pkg/response"
 
-response.Success(c, data)
-response.BadRequest(c, "error", err)
-response.NotFound(c, "not found", err)
+// All responses use Success() - it auto-detects pagination!
+response.Success(c, data)           // 200 with data
+response.Success(c, paginator)      // 200 with data + meta + links (auto-detected)
+response.Created(c, data)           // 201 created
+response.NoContent(c)               // 204 no content
+
+// Error responses
+response.BadRequest(c, "message", err)
+response.NotFound(c, "message", err)
+response.Unauthorized(c)
+response.Forbidden(c)
+response.HandleError(c, "message", err)  // Auto-maps error to status code
+
+// With inline transformation (optional, rare)
+response.Transform(c, user, func(u *User) any {
+    return map[string]any{"id": u.ID, "name": u.Username}
+})
 ```
 
 ## Pagination
@@ -86,8 +100,21 @@ response.NotFound(c, "not found", err)
 ```go
 import "github.com/eogo-dev/eogo/pkg/pagination"
 
-paginator, _ := pagination.PaginateFromContext[User](c, db)
-c.JSON(200, paginator)
+// Simple pagination - just pass paginator to Success()
+users, paginator, err := pagination.New[User](c, db.Model(&User{}))
+response.Success(c, paginator)  // Auto-outputs data + meta + links
+
+// With custom scope
+users, paginator, err := pagination.NewWithScope[User](c, db, func(db *gorm.DB) *gorm.DB {
+    return db.Where("status = ?", "active").Order("created_at DESC")
+})
+response.Success(c, paginator)
+
+// Manual pagination
+req := pagination.FromContext(c)
+users, total, _ := service.List(ctx, req.GetPage(), req.GetPerPage())
+paginator := pagination.NewPaginator(users, total, req.GetPage(), req.GetPerPage())
+response.Success(c, paginator)
 ```
 
 ## Wire Dependency Injection

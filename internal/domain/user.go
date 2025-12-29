@@ -5,21 +5,24 @@ import (
 	"time"
 )
 
-// User represents the pure domain entity (no ORM tags, no JSON tags)
-// This is the core business object that all layers work with
+// User represents the core domain entity.
+// JSON tags control API output - Password is hidden by default.
+//
+// For most cases, just use response.Success(c, user) directly.
+// The Password field is automatically excluded from JSON output.
 type User struct {
-	ID        uint
-	Username  string
-	Email     string
-	Password  string // hashed password
-	Nickname  string
-	Avatar    string
-	Phone     string
-	Bio       string
-	Status    int // 1: active, 0: disabled
-	LastLogin *time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint       `json:"id"`
+	Username  string     `json:"username"`
+	Email     string     `json:"email"`
+	Password  string     `json:"-"` // Always hidden in JSON output
+	Nickname  string     `json:"nickname,omitempty"`
+	Avatar    string     `json:"avatar,omitempty"`
+	Phone     string     `json:"phone,omitempty"`
+	Bio       string     `json:"bio,omitempty"`
+	Status    int        `json:"status"`
+	LastLogin *time.Time `json:"last_login,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 }
 
 // IsActive returns whether the user account is active

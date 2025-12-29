@@ -1,10 +1,12 @@
 package user
 
 import (
-	"time"
-
 	"github.com/eogo-dev/eogo/internal/domain"
 )
+
+// ============================================================================
+// Request DTOs (Input)
+// ============================================================================
 
 // UserRegisterRequest represents the registration request
 type UserRegisterRequest struct {
@@ -19,12 +21,6 @@ type UserRegisterRequest struct {
 type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
-}
-
-// UserLoginResponse represents the login response
-type UserLoginResponse struct {
-	AccessToken string            `json:"access_token"`
-	User        *UserResponseData `json:"user"`
 }
 
 // UserUpdateRequest represents the profile update request
@@ -46,34 +42,19 @@ type UserPasswordResetRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
-// UserResponse represents the public user information (DTO)
-type UserResponse struct {
-	ID        uint   `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Nickname  string `json:"nickname"`
-	Avatar    string `json:"avatar"`
-	Phone     string `json:"phone"`
-	Bio       string `json:"bio"`
-	Status    int    `json:"status"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+// ============================================================================
+// Response DTOs (Output)
+// ============================================================================
+
+// UserLoginResponse represents the login response
+type UserLoginResponse struct {
+	AccessToken string       `json:"access_token"`
+	User        *domain.User `json:"user"` // Domain直接输出，Password自动隐藏
 }
 
-// UserResponseData represents user data in login response (DTO)
-type UserResponseData struct {
-	ID        uint       `json:"id"`
-	Username  string     `json:"username"`
-	Email     string     `json:"email"`
-	Nickname  string     `json:"nickname"`
-	Avatar    string     `json:"avatar"`
-	Phone     string     `json:"phone"`
-	Bio       string     `json:"bio"`
-	Status    int        `json:"status"`
-	LastLogin *time.Time `json:"last_login"`
-}
-
-// --- Mapper Functions ---
+// ============================================================================
+// Model Mappers (UserPO <-> domain.User)
+// ============================================================================
 
 // toDomain converts UserPO to domain.User
 func (po *UserPO) toDomain() *domain.User {

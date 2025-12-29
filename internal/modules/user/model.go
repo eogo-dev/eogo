@@ -28,16 +28,3 @@ type UserPO struct {
 func (UserPO) TableName() string {
 	return "users"
 }
-
-// UserInfo represents user information data transfer object
-type UserInfo struct {
-	ID        uint       `json:"id"`
-	Username  string     `json:"username"`
-	Email     string     `json:"email"`
-	Nickname  string     `json:"nickname"`
-	Avatar    string     `json:"avatar"`
-	Phone     string     `json:"phone"`
-	Bio       string     `json:"bio"`
-	Status    int        `json:"status"`
-	LastLogin *time.Time `json:"last_login"`
-}
