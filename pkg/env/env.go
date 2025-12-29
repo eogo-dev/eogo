@@ -45,13 +45,24 @@ func loadEnvFiles() {
 	// Capture system environment variables BEFORE loading any .env files
 	systemEnv := captureSystemEnv()
 
-	// Determine environment from system env first
+	// Determine environment from system env first (highest priority)
 	appEnv = systemEnv["APP_ENV"]
 	if appEnv == "" {
 		appEnv = systemEnv["GO_ENV"]
 	}
 	if appEnv == "" {
 		appEnv = systemEnv["GIN_MODE"]
+	}
+
+	// Check for explicit environment file (EOGO_ENV_FILE)
+	if envFile := systemEnv["EOGO_ENV_FILE"]; envFile != "" {
+		if _, err := os.Stat(envFile); err == nil {
+			_ = godotenv.Load(envFile)
+			// Allow APP_ENV from this specific file if not set by system env
+			if appEnv == "" {
+				appEnv = os.Getenv("APP_ENV")
+			}
+		}
 	}
 
 	// Load .env files in order (lowest priority first)

@@ -12,6 +12,20 @@ import (
 const Version = "1.0.0"
 
 func main() {
+	// Parse global flags before anything else
+	for i := 1; i < len(os.Args); i++ {
+		arg := os.Args[i]
+		if strings.HasPrefix(arg, "--env=") {
+			os.Setenv("APP_ENV", strings.TrimPrefix(arg, "--env="))
+		} else if arg == "--env" && i+1 < len(os.Args) {
+			os.Setenv("APP_ENV", os.Args[i+1])
+		} else if strings.HasPrefix(arg, "--env-file=") {
+			os.Setenv("EOGO_ENV_FILE", strings.TrimPrefix(arg, "--env-file="))
+		} else if arg == "--env-file" && i+1 < len(os.Args) {
+			os.Setenv("EOGO_ENV_FILE", os.Args[i+1])
+		}
+	}
+
 	// Initialize Console Application
 	cli := console.New("eogo", Version)
 

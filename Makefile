@@ -10,8 +10,8 @@ LDFLAGS := -ldflags "-s -w -X main.Version=$(VERSION) -X main.GitCommit=$(GIT_CO
 # Default target
 all: lint test build
 
-# Build the CLI tool
-build:
+# Build the CLI tool (auto-runs wire first)
+build: wire
 	@echo "Building $(BINARY_NAME)..."
 	go build $(LDFLAGS) -o $(BINARY_NAME) cmd/eogo/main.go
 
