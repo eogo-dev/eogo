@@ -73,10 +73,12 @@ Visit: `http://localhost:8025`
 
 ### Windows Users 🪟
 
-Windows users can use the provided PowerShell or batch scripts:
+**Best Option: Git Bash** ⭐ (use same `make` commands as above)
+
+Or use PowerShell/Command Prompt scripts:
 
 ```powershell
-# PowerShell (Recommended)
+# PowerShell
 .\make.ps1 setup
 .\make.ps1 install
 .\make.ps1 dev

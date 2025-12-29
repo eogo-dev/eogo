@@ -11,7 +11,38 @@ This guide helps you set up and run ZGO on Windows.
 
 ## 🚀 Quick Start
 
-### Option 1: Using PowerShell (Recommended)
+### Option 1: Using Git Bash (Recommended) ⭐
+
+**Git Bash** provides a Unix-like terminal on Windows and supports the standard `Makefile` - just like on Linux/Mac!
+
+```bash
+# Clone the repository
+git clone https://github.com/zgiai/zgo.git
+cd zgo
+
+# Copy environment file
+cp .env.example .env
+
+# Setup development environment
+make setup
+
+# Build and install globally
+make install
+
+# Run the server
+make dev
+
+# Or use hot-reload
+make air
+```
+
+**Why Git Bash?**
+- ✅ Use the same commands as Linux/Mac (cross-platform workflow)
+- ✅ Native `make` support (no need for .bat or .ps1)
+- ✅ Better shell scripting capabilities
+- ✅ Already installed with Git for Windows
+
+### Option 2: Using PowerShell
 
 ```powershell
 # Clone the repository
@@ -31,7 +62,7 @@ copy .env.example .env
 .\make.ps1 dev
 ```
 
-### Option 2: Using Command Prompt
+### Option 3: Using Command Prompt
 
 ```cmd
 # Clone the repository
@@ -51,7 +82,7 @@ make.bat install
 make.bat dev
 ```
 
-### Option 3: Direct Go Commands
+### Option 4: Direct Go Commands
 
 ```cmd
 # Build CLI
@@ -62,6 +93,19 @@ go run cmd/server/main.go
 ```
 
 ## 🛠️ Common Commands
+
+### Git Bash (Recommended) ⭐
+
+```bash
+make build        # Build the CLI tool
+make build-server # Build the server
+make test         # Run tests
+make lint         # Code linting
+make wire         # Generate DI code
+make docs         # Generate API docs
+make air          # Run with hot-reload
+make help         # Show all commands
+```
 
 ### PowerShell
 
@@ -112,16 +156,49 @@ JWT_EXPIRATION=3600
 
 ## 🔧 IDE Setup
 
-### Visual Studio Code
+### Visual Studio Code (Recommended)
 
 1. Install the [Go extension](https://marketplace.visualstudio.com/items?itemName=golang.go)
 2. Open the project folder
-3. Press `F5` to debug
+3. Configure Git Bash as default terminal (see below)
+4. Press `F5` to debug
 
-Recommended extensions:
-- Go (golang.go)
-- Go Test Explorer
-- GitLens
+#### Recommended Extensions
+
+- **Go** (golang.go) - Essential for Go development
+- **Go Test Explorer** - Visual test runner
+- **GitLens** - Enhanced Git integration
+- **Error Lens** - Inline error display
+
+#### Configure Git Bash Terminal
+
+Create `.vscode/settings.json` in project root:
+
+```json
+{
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.profiles.windows": {
+    "Git Bash": {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "icon": "terminal-bash"
+    }
+  },
+  "go.toolsManagement.autoUpdate": true,
+  "go.useLanguageServer": true,
+  "go.lintOnSave": "workspace",
+  "go.formatTool": "goimports",
+  "editor.formatOnSave": true,
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
+}
+```
 
 ### GoLand
 
@@ -179,7 +256,24 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## 🏃‍♂️ Development Workflow
 
-### Standard Development
+### Standard Development (Git Bash) ⭐
+
+```bash
+# 1. Setup (first time only)
+make setup
+
+# 2. Start development server with hot-reload
+make air
+
+# 3. In another terminal, run tests
+make test
+
+# 4. Before committing
+make lint
+make test
+```
+
+### Standard Development (PowerShell)
 
 ```powershell
 # 1. Setup (first time only)
@@ -240,10 +334,12 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## 💡 Tips
 
-1. **Use Windows Terminal** for a better command-line experience
-2. **WSL2** is an alternative if you prefer Linux commands
-3. **Docker Desktop** can be used for containerized development
-4. Enable **Developer Mode** in Windows 11 for better dev experience
+1. **Use Git Bash** ⭐ - Best cross-platform experience, native `make` support, comes with Git for Windows
+2. **Windows Terminal** - Modern terminal app that can run Git Bash, PowerShell, and CMD in tabs
+3. **WSL2** - Full Linux environment on Windows (if you need complete Linux compatibility)
+4. **Docker Desktop** - Containerized development environment
+5. Enable **Developer Mode** in Windows 11 for better dev experience (Settings → Privacy & Security → For Developers)
+6. **VS Code** - See IDE Setup section above for complete Git Bash integration
 
 ---
 
