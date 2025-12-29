@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 

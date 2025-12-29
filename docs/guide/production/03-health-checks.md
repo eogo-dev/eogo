@@ -4,7 +4,7 @@
 
 ## Overview
 
-Eogo provides health check infrastructure for:
+ZGO provides health check infrastructure for:
 
 - **Liveness Probe**: Is the application alive?
 - **Readiness Probe**: Is the application ready to serve traffic?
@@ -21,7 +21,7 @@ Eogo provides health check infrastructure for:
 ## Quick Start
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/health"
+import "github.com/zgiai/zgo/internal/infra/health"
 
 // Register routes
 health.RegisterRoutes(r)
@@ -181,13 +181,13 @@ Or when unhealthy (HTTP 503):
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eogo
+  name: zgo
 spec:
   template:
     spec:
       containers:
-        - name: eogo
-          image: eogo:latest
+        - name: zgo
+          image: zgo:latest
           ports:
             - containerPort: 8080
           livenessProbe:

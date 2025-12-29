@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

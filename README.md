@@ -1,10 +1,10 @@
-# Eogo 🚀
+# ZGO 🚀
 
 **Enterprise Orchestration in Go**
 
 The Orchestrable Go Framework for the Intelligent Era.
 
-[![Website](https://img.shields.io/badge/Website-eogo.dev-blue?style=for-the-badge)](https://eogo.dev)
+[![Website](https://img.shields.io/badge/Website-zgo.dev-blue?style=for-the-badge)](https://zgo.dev)
 
 ![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=for-the-badge&logo=go)
 ![Architecture](https://img.shields.io/badge/Arch-DDD-success?style=for-the-badge)
@@ -23,9 +23,9 @@ The Orchestrable Go Framework for the Intelligent Era.
 ## 📂 Project Structure
 
 ```text
-eogo/
+zgo/
 ├── cmd/
-│   ├── eogo/              # CLI tool
+│   ├── zgo/              # CLI tool
 │   └── server/            # HTTP server entry
 ├── internal/
 │   ├── bootstrap/         # Application lifecycle
@@ -51,7 +51,7 @@ eogo/
 
 ```bash
 # Clone and configure
-git clone https://github.com/eogo-dev/eogo.git && cd eogo
+git clone https://github.com/zgiai/zgo.git && cd zgo
 cp .env.example .env
 
 # Install dependencies
@@ -90,4 +90,4 @@ make docs          # Generate API docs
 ---
 
 ## 📜 License
-MIT © 2025 Eogo Team
+MIT © 2025 ZGO Team

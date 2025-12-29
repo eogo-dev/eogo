@@ -1,6 +1,6 @@
 # Domain 层详解
 
-> `internal/domain/` 是 Eogo 的核心，包含纯业务逻辑，无框架依赖。
+> `internal/domain/` 是 ZGO 的核心，包含纯业务逻辑，无框架依赖。
 
 ## 目录结构
 

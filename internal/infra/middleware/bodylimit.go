@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/gin-gonic/gin"
 )
 

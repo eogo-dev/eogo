@@ -1,6 +1,6 @@
 # 领域驱动设计 (DDD)
 
-> Eogo 的 Domain 层采用 DDD 战术模式，将业务逻辑集中在领域层。
+> ZGO 的 Domain 层采用 DDD 战术模式，将业务逻辑集中在领域层。
 
 ## 概述
 
@@ -110,7 +110,7 @@ func (e Email) Domain() string {
 - 自我验证（创建时验证）
 - 按值比较
 
-**Eogo 中的值对象**：
+**ZGO 中的值对象**：
 
 | 值对象 | 用途 | 验证规则 |
 |--------|------|----------|
@@ -197,7 +197,7 @@ domain.Dispatch(ctx, domain.NewUserRegisteredEvent(user.ID, user.Username, user.
 domain.DispatchAsync(ctx, event)
 ```
 
-**Eogo 中的领域事件**：
+**ZGO 中的领域事件**：
 
 | 事件 | 触发时机 | 典型处理 |
 |------|----------|----------|
@@ -263,7 +263,7 @@ func (s *AuthenticationService) Authenticate(ctx context.Context, identifier, pa
 }
 ```
 
-**Eogo 中的领域服务**：
+**ZGO 中的领域服务**：
 
 | 服务 | 职责 |
 |------|------|

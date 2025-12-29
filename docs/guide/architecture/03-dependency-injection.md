@@ -1,6 +1,6 @@
 # 依赖注入 (Dependency Injection)
 
-> Eogo 使用 Google Wire 实现编译时依赖注入，零运行时开销。
+> ZGO 使用 Google Wire 实现编译时依赖注入，零运行时开销。
 
 ## 为什么选择 Wire？
 
@@ -151,14 +151,14 @@ package wiring
 
 import (
     "github.com/google/wire"
-    "github.com/eogo-dev/eogo/internal/app"
-    "github.com/eogo-dev/eogo/internal/infra/config"
-    "github.com/eogo-dev/eogo/internal/infra/database"
-    "github.com/eogo-dev/eogo/internal/infra/email"
-    "github.com/eogo-dev/eogo/internal/infra/jwt"
-    "github.com/eogo-dev/eogo/internal/modules/permission"
-    "github.com/eogo-dev/eogo/internal/modules/user"
-    "github.com/eogo-dev/eogo/pkg/hash"
+    "github.com/zgiai/zgo/internal/app"
+    "github.com/zgiai/zgo/internal/infra/config"
+    "github.com/zgiai/zgo/internal/infra/database"
+    "github.com/zgiai/zgo/internal/infra/email"
+    "github.com/zgiai/zgo/internal/infra/jwt"
+    "github.com/zgiai/zgo/internal/modules/permission"
+    "github.com/zgiai/zgo/internal/modules/user"
+    "github.com/zgiai/zgo/pkg/hash"
 )
 
 func InitializeApp() (*app.Application, func(), error) {
@@ -250,7 +250,7 @@ func main() {
 ### 步骤 1: 创建模块
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 ### 步骤 2: 定义 Provider
@@ -403,7 +403,7 @@ wire: multiple providers for SomeInterface
 
 ## 与 NestJS 对比
 
-| NestJS | Eogo (Wire) |
+| NestJS | ZGO (Wire) |
 |--------|-------------|
 | `@Injectable()` | 普通构造函数 |
 | `@Module({ providers })` | `wire.NewSet(...)` |

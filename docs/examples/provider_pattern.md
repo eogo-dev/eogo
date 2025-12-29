@@ -5,7 +5,7 @@ This example demonstrates how to create a new module with dependency injection u
 ## Step 1: Create Module Structure
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 This generates:
@@ -99,7 +99,7 @@ var ProviderSet = wire.NewSet(
 package app
 
 import (
-    "github.com/eogo-dev/eogo/internal/modules/blog"
+    "github.com/zgiai/zgo/internal/modules/blog"
     "github.com/google/wire"
 )
 

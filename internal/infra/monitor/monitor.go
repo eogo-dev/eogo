@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/internal/infra/container"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/container"
 	"gorm.io/gorm"
 )
 

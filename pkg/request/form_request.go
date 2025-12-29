@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/eogo-dev/eogo/pkg/validation"
+	"github.com/zgiai/zgo/pkg/validation"
 	"github.com/gin-gonic/gin"
 )
 

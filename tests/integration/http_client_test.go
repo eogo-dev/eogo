@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	httpclient "github.com/eogo-dev/eogo/internal/infra/http"
+	httpclient "github.com/zgiai/zgo/internal/infra/http"
 )
 
 func TestHTTPClient_Get(t *testing.T) {

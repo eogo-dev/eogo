@@ -19,7 +19,7 @@ package handler
 import (
 	"strconv"
 
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

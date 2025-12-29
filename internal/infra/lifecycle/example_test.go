@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/lifecycle"
+	"github.com/zgiai/zgo/internal/infra/lifecycle"
 )
 
 // Example: How to use Lifecycle in Eogo

@@ -3,7 +3,7 @@ package logger
 import (
 	"time"
 
-	"github.com/eogo-dev/eogo/pkg/env"
+	"github.com/zgiai/zgo/pkg/env"
 )
 
 // Boot initializes the logger from environment configuration

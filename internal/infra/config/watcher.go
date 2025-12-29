@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eogo-dev/eogo/pkg/logger"
+	"github.com/zgiai/zgo/pkg/logger"
 	"github.com/fsnotify/fsnotify"
 )
 

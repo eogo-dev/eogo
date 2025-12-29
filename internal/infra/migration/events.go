@@ -4,7 +4,7 @@ package migration
 import (
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/events"
+	"github.com/zgiai/zgo/internal/infra/events"
 )
 
 // Event name constants for migration events

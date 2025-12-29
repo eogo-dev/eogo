@@ -84,7 +84,7 @@ llm/
 
 ```bash
 # Use CLI to generate
-./eogo make:module Blog
+./zgo make:module Blog
 
 # After generation:
 # 1. Register routes in routes/api.go

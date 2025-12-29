@@ -40,7 +40,7 @@ type Config struct {
 }
 
 type AppConfig struct {
-    Name  string `env:"APP_NAME" envDefault:"eogo"`
+    Name  string `env:"APP_NAME" envDefault:"zgo"`
     Env   string `env:"APP_ENV" envDefault:"development"`
     Debug bool   `env:"APP_DEBUG" envDefault:"true"`
 }

@@ -11,7 +11,7 @@ type DatabaseConfig struct {
     Driver       string `env:"DB_DRIVER" envDefault:"mysql"`
     Host         string `env:"DB_HOST" envDefault:"localhost"`
     Port         int    `env:"DB_PORT" envDefault:"3306"`
-    Database     string `env:"DB_DATABASE" envDefault:"eogo"`
+    Database     string `env:"DB_DATABASE" envDefault:"zgo"`
     Username     string `env:"DB_USERNAME" envDefault:"root"`
     Password     string `env:"DB_PASSWORD" envDefault:""`
     MaxIdleConns int    `env:"DB_MAX_IDLE_CONNS" envDefault:"10"`
@@ -26,7 +26,7 @@ Environment variables:
 DB_DRIVER=mysql
 DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=eogo
+DB_DATABASE=zgo
 DB_USERNAME=root
 DB_PASSWORD=secret
 DB_MAX_IDLE_CONNS=10
@@ -283,13 +283,13 @@ func All() []*gormigrate.Migration {
 ### Run Migrations
 
 ```bash
-./eogo migrate
+./zgo migrate
 ```
 
 ## Pagination
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/pagination"
+import "github.com/zgiai/zgo/internal/infra/pagination"
 
 // From Gin context (auto-extracts ?page=1&per_page=15)
 paginator, err := pagination.PaginateFromContext[User](c, db)
@@ -380,10 +380,10 @@ sqlDB.SetConnMaxIdleTime(10 * time.Minute)
 Enable database tracing:
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/tracing"
+import "github.com/zgiai/zgo/internal/infra/tracing"
 
 // Add tracing plugin
-tracing.WithTracing(db, "eogo")
+tracing.WithTracing(db, "zgo")
 ```
 
 ## Best Practices

@@ -1,6 +1,6 @@
 # Business Module Development
 
-> How to create and structure business modules in Eogo.
+> How to create and structure business modules in ZGO.
 
 ## Module Structure
 
@@ -22,7 +22,7 @@ internal/modules/blog/
 Use the CLI to generate a new module:
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 This generates all files with proper structure and Wire configuration.

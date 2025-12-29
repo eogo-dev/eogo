@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/eogo-dev/eogo/pkg/handler"
-	"github.com/eogo-dev/eogo/pkg/pagination"
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/pkg/handler"
+	"github.com/zgiai/zgo/pkg/pagination"
+	"github.com/zgiai/zgo/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

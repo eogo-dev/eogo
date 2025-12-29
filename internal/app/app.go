@@ -1,13 +1,13 @@
 package app
 
 import (
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/internal/infra/email"
-	"github.com/eogo-dev/eogo/internal/infra/events"
-	"github.com/eogo-dev/eogo/internal/infra/jwt"
-	"github.com/eogo-dev/eogo/internal/infra/migration"
-	"github.com/eogo-dev/eogo/internal/modules/permission"
-	"github.com/eogo-dev/eogo/internal/modules/user"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/email"
+	"github.com/zgiai/zgo/internal/infra/events"
+	"github.com/zgiai/zgo/internal/infra/jwt"
+	"github.com/zgiai/zgo/internal/infra/migration"
+	"github.com/zgiai/zgo/internal/modules/permission"
+	"github.com/zgiai/zgo/internal/modules/user"
 	"gorm.io/gorm"
 )
 

@@ -1,44 +1,44 @@
-# Eogo CLI Usage Guide
+# ZGO CLI Usage Guide
 
 ## Building the CLI
 
 ```bash
 make build
 # or
-go build -o eogo cmd/eogo/main.go
+go build -o zgo cmd/zgo/main.go
 ```
 
-This creates the `eogo` binary in the root directory.
+This creates the `zgo` binary in the root directory.
 
 ## Available Commands
 
 ### General Commands
 
 ```bash
-./eogo --help          # Show all commands
-./eogo version         # Show version
-./eogo env             # Display environment
-./eogo serve           # Start HTTP server (same as `make server`)
+./zgo --help          # Show all commands
+./zgo version         # Show version
+./zgo env             # Display environment
+./zgo serve           # Start HTTP server (same as `make server`)
 ```
 
 ### Database Migrations
 
 ```bash
 # Run all pending migrations
-./eogo migrate
-./eogo db:migrate      # alias
+./zgo migrate
+./zgo db:migrate      # alias
 
 # Rollback last migration batch
-./eogo migrate:rollback
-./eogo db:rollback     # alias
+./zgo migrate:rollback
+./zgo db:rollback     # alias
 
 # Drop all tables and re-run migrations
-./eogo migrate:fresh
-./eogo db:fresh        # alias
+./zgo migrate:fresh
+./zgo db:fresh        # alias
 
 # Show migration status
-./eogo migrate:status
-./eogo db:status       # alias
+./zgo migrate:status
+./zgo db:status       # alias
 ```
 
 **Migration Status Output:**
@@ -55,8 +55,8 @@ create_organizations_table   2   Ran
 ### Database Seeders
 
 ```bash
-./eogo seed
-./eogo db:seed
+./zgo seed
+./zgo db:seed
 ```
 
 ### Code Generation
@@ -64,7 +64,7 @@ create_organizations_table   2   Ran
 #### Create Migration
 
 ```bash
-./eogo make:migration create_posts_table
+./zgo make:migration create_posts_table
 ```
 
 Creates: `database/migrations/YYYY_MM_DD_HHMMSS_create_posts_table.go`
@@ -96,7 +96,7 @@ func init() {
 #### Create Module
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 Creates complete module structure:
@@ -114,17 +114,17 @@ internal/modules/blog/
 #### Create Individual Components
 
 ```bash
-./eogo make:model Post
-./eogo make:repository PostRepository
-./eogo make:service PostService
-./eogo make:handler PostHandler
-./eogo make:seeder PostSeeder
+./zgo make:model Post
+./zgo make:repository PostRepository
+./zgo make:service PostService
+./zgo make:handler PostHandler
+./zgo make:seeder PostSeeder
 ```
 
 ### Routes
 
 ```bash
-./eogo route:list
+./zgo route:list
 ```
 
 **Output:**
@@ -156,7 +156,7 @@ database/
     └── seeders.go
 ```
 
-**Important:** The `cmd/migrate/` directory is empty and unused. Migrations are managed through `cmd/eogo/` CLI.
+**Important:** The `cmd/migrate/` directory is empty and unused. Migrations are managed through `cmd/zgo/` CLI.
 
 ## Common Workflows
 
@@ -164,31 +164,31 @@ database/
 
 ```bash
 # Create migration
-./eogo make:migration create_posts_table
+./zgo make:migration create_posts_table
 
 # Edit the file: database/migrations/YYYY_MM_DD_HHMMSS_create_posts_table.go
 
 # Run migration
-./eogo migrate
+./zgo migrate
 
 # Check status
-./eogo migrate:status
+./zgo migrate:status
 ```
 
 ### 2. Create Full Module
 
 ```bash
 # Generate module
-./eogo make:module Post
+./zgo make:module Post
 
 # Add migration
-./eogo make:migration create_posts_table
+./zgo make:migration create_posts_table
 
 # Update internal/modules/wire.go to include PostProviderSet
 # Update routes/router.go to register routes
 
 # Run migration
-./eogo migrate
+./zgo migrate
 
 # Start server
 make dev
@@ -198,10 +198,10 @@ make dev
 
 ```bash
 # WARNING: This drops all tables!
-./eogo migrate:fresh
+./zgo migrate:fresh
 
 # Optionally run seeders
-./eogo seed
+./zgo seed
 ```
 
 ## Development Workflow
@@ -211,25 +211,25 @@ make dev
 make build
 
 # 2. Run migrations
-./eogo migrate
+./zgo migrate
 
 # 3. Start dev server with hot reload
 make dev
 
 # 4. In another terminal, list routes
-./eogo route:list
+./zgo route:list
 
 # 5. Create new module
-./eogo make:module Product
+./zgo make:module Product
 ```
 
 ## Notes
 
-- **Binary location:** Root directory (`./eogo`)
+- **Binary location:** Root directory (`./zgo`)
 - **Migration files:** `database/migrations/`
 - **Auto-registration:** Migrations use `init()` to register
 - **Naming:** Migration files are timestamped
-- **`cmd/migrate/` is unused** - Use `./eogo migrate` instead
+- **`cmd/migrate/` is unused** - Use `./zgo migrate` instead
 
 ## See Also
 

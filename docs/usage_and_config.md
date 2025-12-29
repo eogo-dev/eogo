@@ -1,10 +1,10 @@
 # Project Usage & Configuration Guide
 
-This document provides a step-by-step guide for configuring and using the Eogo project.
+This document provides a step-by-step guide for configuring and using the ZGO project.
 
 ## 1. Overview
 
-Eogo is a modern Go scaffold for AI-powered development, built with the "Vibe Enterprise" philosophy. It supports JWT authentication, multi-tenancy (Organizations/Teams), API Keys, and modular domain architecture out of the box.
+ZGO is a modern Go scaffold for AI-powered development, built with the "Vibe Enterprise" philosophy. It supports JWT authentication, multi-tenancy (Organizations/Teams), API Keys, and modular domain architecture out of the box.
 
 ## 2. Configuration Philosophy
 
@@ -17,8 +17,8 @@ Eogo is a modern Go scaffold for AI-powered development, built with the "Vibe En
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/zgiai/eogo.git
-cd eogo
+git clone https://github.com/zgiai/zgo.git
+cd zgo
 ```
 
 ### Step 2: Install Dependencies

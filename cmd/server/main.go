@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/eogo-dev/eogo/internal/bootstrap"
-	"github.com/eogo-dev/eogo/internal/wiring"
+	"github.com/zgiai/zgo/internal/bootstrap"
+	"github.com/zgiai/zgo/internal/wiring"
 )
 
 // @title Eogo API

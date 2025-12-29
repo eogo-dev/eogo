@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/eogo-dev/eogo/pkg/request"
+	"github.com/zgiai/zgo/pkg/request"
 	"github.com/gin-gonic/gin"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/eogo-dev/eogo/pkg/env"
+	"github.com/zgiai/zgo/pkg/env"
 )
 
 // GlobalConfig stores the global configuration

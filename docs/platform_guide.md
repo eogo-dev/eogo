@@ -1,6 +1,6 @@
-# Eogo Platform Guide
+# ZGO Platform Guide
 
-*Comprehensive guide for building applications with the Eogo framework*
+*Comprehensive guide for building applications with the ZGO framework*
 
 ## Table of Contents
 
@@ -27,9 +27,9 @@
 package blog
 
 import (
-    "github.com/eogo-dev/eogo/pkg/pagination"
-    "github.com/eogo-dev/eogo/pkg/response"
-    "github.com/eogo-dev/eogo/pkg/resource"
+    "github.com/zgiai/zgo/pkg/pagination"
+    "github.com/zgiai/zgo/pkg/response"
+    "github.com/zgiai/zgo/pkg/resource"
     "github.com/gin-gonic/gin"
     "gorm.io/gorm"
 )
@@ -81,7 +81,7 @@ func (h *Handler) Create(c *gin.Context) {
 
 ### Pagination
 
-**Package:** `github.com/eogo-dev/eogo/pkg/pagination`
+**Package:** `github.com/zgiai/zgo/pkg/pagination`
 
 #### Quick Reference
 
@@ -161,7 +161,7 @@ users, paging, err := pagination.Paginate[User](db.Where("status = ?", "active")
 
 ### Response Helpers
 
-**Package:** `github.com/eogo-dev/eogo/pkg/response`
+**Package:** `github.com/zgiai/zgo/pkg/response`
 
 #### Standard Responses
 
@@ -217,7 +217,7 @@ Error responses:
 
 ### Resource Transformers
 
-**Package:** `github.com/eogo-dev/eogo/pkg/resource`
+**Package:** `github.com/zgiai/zgo/pkg/resource`
 
 Resource transformers convert database models to API responses, hiding sensitive fields and formatting output.
 
@@ -338,7 +338,7 @@ resource.RespondCollection(c, 200, collection)
 
 ### Validation
 
-**Package:** `github.com/eogo-dev/eogo/pkg/validation`
+**Package:** `github.com/zgiai/zgo/pkg/validation`
 
 Use struct tags and Gin's binding for validation:
 
@@ -372,10 +372,10 @@ func (h *Handler) Create(c *gin.Context) {
 
 ### Error Handling
 
-**Package:** `github.com/eogo-dev/eogo/pkg/errors`
+**Package:** `github.com/zgiai/zgo/pkg/errors`
 
 ```go
-import "github.com/eogo-dev/eogo/pkg/errors"
+import "github.com/zgiai/zgo/pkg/errors"
 
 // Predefined errors
 err := errors.ErrUserNotFound
@@ -440,7 +440,7 @@ ecommerce/
 #### Using CLI (Recommended)
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 This generates:
@@ -556,7 +556,7 @@ func (h *Handler) Create(c *gin.Context) {
 package mymodule
 
 import (
-    "github.com/eogo-dev/eogo/internal/infra/router"
+    "github.com/zgiai/zgo/internal/infra/router"
 )
 
 func Register(r *router.Router) {
@@ -604,7 +604,7 @@ func GetHandler(db *gorm.DB) *Handler {
 Update `internal/modules/wire.go`:
 
 ```go
-import mymodule "github.com/eogo-dev/eogo/internal/modules/mymodule"
+import mymodule "github.com/zgiai/zgo/internal/modules/mymodule"
 
 var AllProviders = wire.NewSet(
     user.ProviderSet,

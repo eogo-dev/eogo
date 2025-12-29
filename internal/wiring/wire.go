@@ -4,10 +4,10 @@
 package wiring
 
 import (
-	"github.com/eogo-dev/eogo/internal/app"
-	"github.com/eogo-dev/eogo/internal/infra"
-	"github.com/eogo-dev/eogo/internal/modules/permission"
-	"github.com/eogo-dev/eogo/internal/modules/user"
+	"github.com/zgiai/zgo/internal/app"
+	"github.com/zgiai/zgo/internal/infra"
+	"github.com/zgiai/zgo/internal/modules/permission"
+	"github.com/zgiai/zgo/internal/modules/user"
 	"github.com/google/wire"
 )
 

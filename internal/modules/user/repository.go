@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/eogo-dev/eogo/internal/domain"
+	"github.com/zgiai/zgo/internal/domain"
 	"gorm.io/gorm"
 )
 

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/eogo-dev/eogo/pkg/logger"
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/pkg/logger"
+	"github.com/zgiai/zgo/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

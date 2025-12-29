@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/pkg/logger"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/pkg/logger"
 )
 
 var (

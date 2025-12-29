@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/eogo-dev/eogo/internal/infra/router"
+	"github.com/zgiai/zgo/internal/infra/router"
 )
 
 // RegisterRoutes registers the user module routes

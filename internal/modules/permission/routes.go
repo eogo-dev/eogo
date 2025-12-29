@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"github.com/eogo-dev/eogo/internal/infra/router"
+	"github.com/zgiai/zgo/internal/infra/router"
 )
 
 // RegisterRoutes registers permission module routes

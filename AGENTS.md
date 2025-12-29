@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for AI coding agents working on the Eogo framework.
+Instructions for AI coding agents working on the ZGO framework.
 
 ## Project Overview
 
@@ -9,9 +9,9 @@ EOGO is a modern Go framework using Domain-Driven Design (DDD) + layered archite
 ## Directory Structure
 
 ```text
-eogo/
+zgo/
 ├── cmd/
-│   ├── eogo/              # CLI tool
+│   ├── zgo/              # CLI tool
 │   └── server/            # HTTP server entry
 ├── internal/
 │   ├── bootstrap/         # Application startup
@@ -75,7 +75,7 @@ type User struct {
 ## Handler Utilities
 
 ```go
-import "github.com/eogo-dev/eogo/pkg/handler"
+import "github.com/zgiai/zgo/pkg/handler"
 
 // Parse URL parameters (auto sends error response)
 id, ok := handler.ParseID(c, "id")
@@ -103,7 +103,7 @@ active := handler.QueryBool(c, "active", true)
 ## Unified Response
 
 ```go
-import "github.com/eogo-dev/eogo/pkg/response"
+import "github.com/zgiai/zgo/pkg/response"
 
 // All responses use Success() - it auto-detects pagination!
 response.Success(c, data)           // 200 with data
@@ -136,7 +136,7 @@ response.Success(c, map[string]any{
 ## Pagination
 
 ```go
-import "github.com/eogo-dev/eogo/pkg/pagination"
+import "github.com/zgiai/zgo/pkg/pagination"
 
 // ========== 方式1: Handler 直接查询 (最简单，AI推荐) ==========
 func (h *Handler) List(c *gin.Context) {
@@ -187,9 +187,9 @@ paginator.SetPageName("p")  // URLs: /posts?p=2
 package user
 
 import (
-    "github.com/eogo-dev/eogo/pkg/handler"
-    "github.com/eogo-dev/eogo/pkg/pagination"
-    "github.com/eogo-dev/eogo/pkg/response"
+    "github.com/zgiai/zgo/pkg/handler"
+    "github.com/zgiai/zgo/pkg/pagination"
+    "github.com/zgiai/zgo/pkg/response"
     "github.com/gin-gonic/gin"
 )
 
@@ -286,7 +286,7 @@ Run `cd internal/wiring && wire` to generate code.
 ## Creating New Modules
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 
 # Then:
 # 1. Register routes in routes/api.go

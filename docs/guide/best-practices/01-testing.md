@@ -1,6 +1,6 @@
 # Testing Guide
 
-> Unit, integration, and feature testing strategies for Eogo.
+> Unit, integration, and feature testing strategies for ZGO.
 
 ## Test Structure
 

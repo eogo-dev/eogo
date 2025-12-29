@@ -1,6 +1,6 @@
 # 快速开始
 
-> 5 分钟上手 Eogo 框架
+> 5 分钟上手 ZGO 框架
 
 ## 环境要求
 
@@ -12,8 +12,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/eogo-dev/eogo.git
-cd eogo
+git clone https://github.com/zgiai/zgo.git
+cd zgo
 
 # 安装依赖
 go mod download
@@ -34,7 +34,7 @@ cp .env.example .env
 
 ```env
 # 应用配置
-APP_NAME=eogo
+APP_NAME=zgo
 APP_ENV=development
 APP_DEBUG=true
 
@@ -46,7 +46,7 @@ SERVER_MODE=debug
 DB_DRIVER=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=eogo
+DB_DATABASE=zgo
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -59,7 +59,7 @@ JWT_EXPIRE=24h
 
 ```bash
 # 运行数据库迁移
-./eogo migrate
+./zgo migrate
 
 # 启动开发服务器（热重载）
 make air
@@ -75,7 +75,7 @@ go run cmd/server/main.go
 使用 CLI 创建一个 Blog 模块：
 
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 这会生成以下文件：
@@ -96,7 +96,7 @@ internal/modules/blog/
 编辑 `routes/api.go`，添加模块路由：
 
 ```go
-import "github.com/eogo-dev/eogo/internal/modules/blog"
+import "github.com/zgiai/zgo/internal/modules/blog"
 
 func Setup(r *gin.Engine, handlers *app.Handlers) {
     // ... 其他路由

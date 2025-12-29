@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/eogo-dev/eogo/database/migrations"
-	"github.com/eogo-dev/eogo/internal/bootstrap"
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/internal/infra/console"
-	"github.com/eogo-dev/eogo/internal/infra/database"
-	"github.com/eogo-dev/eogo/internal/infra/migration"
+	"github.com/zgiai/zgo/database/migrations"
+	"github.com/zgiai/zgo/internal/bootstrap"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/console"
+	"github.com/zgiai/zgo/internal/infra/database"
+	"github.com/zgiai/zgo/internal/infra/migration"
 	"gorm.io/gorm"
 )
 

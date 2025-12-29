@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/eogo-dev/eogo/internal/app"
-	"github.com/eogo-dev/eogo/internal/infra/router"
+	"github.com/zgiai/zgo/internal/app"
+	"github.com/zgiai/zgo/internal/infra/router"
 	"github.com/gin-gonic/gin"
 )
 

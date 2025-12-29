@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/internal/infra/storage"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/storage"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/events"
+	"github.com/zgiai/zgo/internal/infra/events"
 )
 
 // ============================================

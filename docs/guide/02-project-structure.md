@@ -1,13 +1,13 @@
 # 项目结构
 
-> Eogo 采用清晰的分层目录结构，遵循 Go 社区最佳实践。
+> ZGO 采用清晰的分层目录结构，遵循 Go 社区最佳实践。
 
 ## 目录总览
 
 ```
-eogo/
+zgo/
 ├── cmd/                    # 应用入口
-│   ├── eogo/              # CLI 工具
+│   ├── zgo/              # CLI 工具
 │   ├── server/            # HTTP 服务器
 │   └── migrate/           # 数据库迁移工具
 │
@@ -50,8 +50,8 @@ eogo/
 
 ```
 cmd/
-├── eogo/           # 框架 CLI 工具
-│   └── main.go    # ./eogo make:module, ./eogo migrate
+├── zgo/           # 框架 CLI 工具
+│   └── main.go    # ./zgo make:module, ./zgo migrate
 ├── server/         # HTTP 服务器
 │   └── main.go    # 主服务入口
 └── migrate/        # 迁移工具

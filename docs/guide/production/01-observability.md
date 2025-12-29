@@ -4,7 +4,7 @@
 
 ## Overview
 
-Eogo provides three pillars of observability:
+ZGO provides three pillars of observability:
 
 | Pillar | Implementation | Purpose |
 |--------|---------------|---------|
@@ -59,7 +59,7 @@ GORM plugin for SQL tracing:
 
 ```go
 // Enable database tracing
-tracing.WithTracing(db, "eogo")
+tracing.WithTracing(db, "zgo")
 ```
 
 Captured attributes:
@@ -205,7 +205,7 @@ timer.ObserveDuration()
 ```yaml
 # prometheus.yml
 scrape_configs:
-  - job_name: 'eogo'
+  - job_name: 'zgo'
     static_configs:
       - targets: ['localhost:8080']
     metrics_path: '/metrics'

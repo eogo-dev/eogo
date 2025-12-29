@@ -4,9 +4,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eogo-dev/eogo/internal/infra/console"
-	"github.com/eogo-dev/eogo/internal/infra/console/commands"
-	"github.com/eogo-dev/eogo/internal/infra/plugin"
+	"github.com/zgiai/zgo/internal/infra/console"
+	"github.com/zgiai/zgo/internal/infra/console/commands"
+	"github.com/zgiai/zgo/internal/infra/plugin"
 )
 
 const Version = "1.0.0"
@@ -20,14 +20,14 @@ func main() {
 		} else if arg == "--env" && i+1 < len(os.Args) {
 			os.Setenv("APP_ENV", os.Args[i+1])
 		} else if strings.HasPrefix(arg, "--env-file=") {
-			os.Setenv("EOGO_ENV_FILE", strings.TrimPrefix(arg, "--env-file="))
+			os.Setenv("ZGO_ENV_FILE", strings.TrimPrefix(arg, "--env-file="))
 		} else if arg == "--env-file" && i+1 < len(os.Args) {
-			os.Setenv("EOGO_ENV_FILE", os.Args[i+1])
+			os.Setenv("ZGO_ENV_FILE", os.Args[i+1])
 		}
 	}
 
 	// Initialize Console Application
-	cli := console.New("eogo", Version)
+	cli := console.New("zgo", Version)
 
 	// Register Commands
 	registerCommands(cli)

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/eogo-dev/eogo/internal/domain"
+	"github.com/zgiai/zgo/internal/domain"
 )
 
 // ============================================================================

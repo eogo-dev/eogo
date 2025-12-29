@@ -1,8 +1,8 @@
 package migrations
 
 import (
-	"github.com/eogo-dev/eogo/internal/infra/migration"
-	"github.com/eogo-dev/eogo/internal/modules/permission"
+	"github.com/zgiai/zgo/internal/infra/migration"
+	"github.com/zgiai/zgo/internal/modules/permission"
 	"gorm.io/gorm"
 )
 

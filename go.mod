@@ -1,4 +1,4 @@
-module github.com/eogo-dev/eogo
+module github.com/zgiai/zgo
 
 go 1.24.0
 

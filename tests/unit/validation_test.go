@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/eogo-dev/eogo/pkg/validation"
+	"github.com/zgiai/zgo/pkg/validation"
 	"github.com/go-playground/validator/v10"
 )
 

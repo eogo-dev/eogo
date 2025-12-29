@@ -9,7 +9,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/migration/stubs"
+	"github.com/zgiai/zgo/internal/infra/migration/stubs"
 )
 
 // CreatorOptions configures the migration file creator.

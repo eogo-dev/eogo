@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eogo-dev/eogo/internal/infra/jwt"
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/internal/infra/jwt"
+	"github.com/zgiai/zgo/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

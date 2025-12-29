@@ -2,7 +2,7 @@
 
 ## Overview
 
-Eogo provides a Laravel-style seeder system for populating your database with test or default data.
+ZGO provides a Laravel-style seeder system for populating your database with test or default data.
 
 ## Directory Structure
 
@@ -19,13 +19,13 @@ database/
 ### Generate Seeder File
 
 ```bash
-./eogo make:seeder Product
+./zgo make:seeder Product
 ```
 
 **Output:**
 ```
 ✓ Seeder created: database/seeders/product_seeder.go
-ℹ Run with: ./eogo db:seed
+ℹ Run with: ./zgo db:seed
 ```
 
 ### Generated File Structure
@@ -34,7 +34,7 @@ database/
 package seeders
 
 import (
-    "github.com/eogo-dev/eogo/internal/infra/database"
+    "github.com/zgiai/zgo/internal/infra/database"
 )
 
 type ProductSeeder struct{}
@@ -65,8 +65,8 @@ func init() {
 package seeders
 
 import (
-    "github.com/eogo-dev/eogo/internal/modules/blog"
-    "github.com/eogo-dev/eogo/internal/infra/database"
+    "github.com/zgiai/zgo/internal/modules/blog"
+    "github.com/zgiai/zgo/internal/infra/database"
 )
 
 type PostSeeder struct{}
@@ -98,13 +98,13 @@ func init() {
 ### Run All Seeders
 
 ```bash
-./eogo db:seed
+./zgo db:seed
 ```
 
 Or use the alias:
 
 ```bash
-./eogo seed
+./zgo seed
 ```
 
 **Output:**
@@ -116,7 +116,7 @@ Or use the alias:
 ### Run with Migrations
 
 ```bash
-./eogo migrate --seed
+./zgo migrate --seed
 ```
 
 ## Auto-Registration

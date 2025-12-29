@@ -1,6 +1,6 @@
 # Production Logging Guide
 
-Eogo supports high-volume log storage via ClickHouse and real-time error tracking via Sentry.
+ZGO supports high-volume log storage via ClickHouse and real-time error tracking via Sentry.
 
 ## Sentry Integration
 
@@ -34,7 +34,7 @@ LOG_CH_INTERVAL_MS=1000
 ```
 
 ### 2. Strategy
-Eogo uses an **Asynchronous Batching Strategy**:
+ZGO uses an **Asynchronous Batching Strategy**:
 - Logs are buffered in memory.
 - Flushed to ClickHouse when buffer size reaches `LOG_CH_BATCH_SIZE` or after `LOG_CH_INTERVAL_MS`.
 

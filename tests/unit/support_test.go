@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/eogo-dev/eogo/pkg/support"
+	"github.com/zgiai/zgo/pkg/support"
 )
 
 func TestBlank(t *testing.T) {

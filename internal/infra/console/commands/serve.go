@@ -7,12 +7,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/eogo-dev/eogo/internal/bootstrap"
-	"github.com/eogo-dev/eogo/internal/infra/config"
-	"github.com/eogo-dev/eogo/internal/infra/console"
-	"github.com/eogo-dev/eogo/internal/infra/middleware"
-	"github.com/eogo-dev/eogo/internal/wiring"
-	"github.com/eogo-dev/eogo/routes"
+	"github.com/zgiai/zgo/internal/bootstrap"
+	"github.com/zgiai/zgo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/console"
+	"github.com/zgiai/zgo/internal/infra/middleware"
+	"github.com/zgiai/zgo/internal/wiring"
+	"github.com/zgiai/zgo/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )

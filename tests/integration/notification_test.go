@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/eogo-dev/eogo/internal/infra/notification"
+	"github.com/zgiai/zgo/internal/infra/notification"
 )
 
 // TestNotification implements Notification interface

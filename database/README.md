@@ -2,7 +2,7 @@
 
 ## Overview
 
-Eogo uses a Laravel-style migration system with:
+ZGO uses a Laravel-style migration system with:
 - **Timestamped filenames** for automatic ordering
 - **Auto-registration** using `init()` functions
 - **CLI generator** for creating new migrations
@@ -28,7 +28,7 @@ database/
 ### Generate Migration File
 
 ```bash
-./eogo make:migration create_posts_table
+./zgo make:migration create_posts_table
 ```
 
 **Output:**
@@ -83,7 +83,7 @@ func init() {
 ## Running Migrations
 
 ```bash
-./eogo migrate
+./zgo migrate
 ```
 
 **Output:**

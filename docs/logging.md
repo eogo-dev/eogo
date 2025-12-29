@@ -1,11 +1,11 @@
 # EOGO Logging
 
-Eogo logging system supporting multiple channels, level control, and file rotation.
+ZGO logging system supporting multiple channels, level control, and file rotation.
 
 ## Quick Start
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/logger"
+import "github.com/zgiai/zgo/internal/infra/logger"
 
 // Bootstrap (call once in main.go)
 logger.Boot()

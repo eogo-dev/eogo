@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/eogo-dev/eogo/cmd/tools/apidoc/parser"
+	"github.com/zgiai/zgo/cmd/tools/apidoc/parser"
 )
 
 func main() {

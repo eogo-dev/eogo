@@ -38,7 +38,7 @@
 package resource
 
 import (
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/pkg/response"
 )
 
 // Transformer is a function that transforms a model to API output.

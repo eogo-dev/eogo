@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/config"
+	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/gin-gonic/gin"
 )
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Eogo uses [Google Wire](https://github.com/google/wire) for compile-time dependency injection, similar to NestJS's DI system but **type-safe and zero runtime overhead**.
+ZGO uses [Google Wire](https://github.com/google/wire) for compile-time dependency injection, similar to NestJS's DI system but **type-safe and zero runtime overhead**.
 
 ## Philosophy: Distributed Providers
 
@@ -53,8 +53,8 @@ var ProviderSet = wire.NewSet(
 package app
 
 import (
-    "github.com/eogo-dev/eogo/internal/modules/user"
-    "github.com/eogo-dev/eogo/internal/modules/permission"
+    "github.com/zgiai/zgo/internal/modules/user"
+    "github.com/zgiai/zgo/internal/modules/permission"
     "github.com/google/wire"
 )
 
@@ -77,7 +77,7 @@ func InitApp(db *gorm.DB) (*App, error) {
 
 ## Comparison with NestJS
 
-| NestJS | Eogo (Wire) |
+| NestJS | ZGO (Wire) |
 |--------|-------------|
 | `@Injectable()` | Constructor function (`NewService`) |
 | `@Module({ providers: [...] })` | `wire.NewSet(...)` |
@@ -89,7 +89,7 @@ func InitApp(db *gorm.DB) (*App, error) {
 
 ### 1. Generate Scaffold
 ```bash
-./eogo make:module Blog
+./zgo make:module Blog
 ```
 
 This auto-generates `provider.go`:
@@ -110,7 +110,7 @@ var ProviderSet = wire.NewSet(
 ### 2. Register in Central Wire
 Add to `internal/modules/wire.go`:
 ```go
-import "github.com/eogo-dev/eogo/internal/modules/blog"
+import "github.com/zgiai/zgo/internal/modules/blog"
 
 type App struct {
     User       *user.Handler

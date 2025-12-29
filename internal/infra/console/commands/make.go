@@ -8,8 +8,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/infra/console"
-	"github.com/eogo-dev/eogo/internal/infra/migration"
+	"github.com/zgiai/zgo/internal/infra/console"
+	"github.com/zgiai/zgo/internal/infra/migration"
 )
 
 // MakeModelCommand creates a new model
@@ -381,8 +381,8 @@ func (c *MakeModuleCommand) Run(args []string) error {
 		"HandlerName":    pascal,
 		"RepositoryName": pascal,
 		"TableName":      snake + "s",
-		"ModulePath":     "github.com/eogo-dev/eogo/internal/modules/" + snake,
-		"PlatformPath":   "github.com/eogo-dev/eogo/internal/infra",
+		"ModulePath":     "github.com/zgiai/zgo/internal/modules/" + snake,
+		"PlatformPath":   "github.com/zgiai/zgo/internal/infra",
 	}
 
 	for _, f := range files {
@@ -423,7 +423,7 @@ func injectProvider(moduleName string) error {
 	code := string(content)
 
 	// 1. Add Import
-	importPath := fmt.Sprintf("\"github.com/eogo-dev/eogo/internal/modules/%s\"", moduleName)
+	importPath := fmt.Sprintf("\"github.com/zgiai/zgo/internal/modules/%s\"", moduleName)
 	if !strings.Contains(code, importPath) {
 		importBlock := "import (\n"
 		if idx := strings.Index(code, importBlock); idx != -1 {
@@ -466,7 +466,7 @@ func injectRoute(moduleName string) error {
 	code := string(content)
 
 	// 1. Add Import
-	importPath := fmt.Sprintf("\"github.com/eogo-dev/eogo/internal/modules/%s\"", moduleName)
+	importPath := fmt.Sprintf("\"github.com/zgiai/zgo/internal/modules/%s\"", moduleName)
 	if !strings.Contains(code, importPath) {
 		importBlock := "import (\n"
 		if idx := strings.Index(code, importBlock); idx != -1 {
@@ -609,7 +609,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/eogo-dev/eogo/pkg/response"
+	"github.com/zgiai/zgo/pkg/response"
 )
 
 // Handler handles HTTP requests for {{.ModelName}}
@@ -869,7 +869,7 @@ func init() {
 const routesTemplate = `package {{.Package}}
 
 import (
-	"github.com/eogo-dev/eogo/internal/infra/router"
+	"github.com/zgiai/zgo/internal/infra/router"
 )
 
 // Register registers routes for this module.

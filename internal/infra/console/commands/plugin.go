@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eogo-dev/eogo/internal/infra/console"
-	"github.com/eogo-dev/eogo/internal/infra/plugin"
+	"github.com/zgiai/zgo/internal/infra/console"
+	"github.com/zgiai/zgo/internal/infra/plugin"
 )
 
 // PluginListCommand lists all installed plugins
@@ -39,7 +39,7 @@ func (c *PluginListCommand) Run(args []string) error {
 		c.output.Info("No plugins installed")
 		c.output.Info("")
 		c.output.Info("Install plugins with:")
-		c.output.Info("  go install github.com/eogo-dev/eogo-ai/cmd/eogo-ai@latest")
+		c.output.Info("  go install github.com/zgiai/zgo-ai/cmd/eogo-ai@latest")
 		return nil
 	}
 

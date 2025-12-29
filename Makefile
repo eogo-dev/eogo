@@ -1,4 +1,4 @@
-BINARY_NAME=eogo
+BINARY_NAME=zgo
 SERVER_NAME=server
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -13,7 +13,7 @@ all: lint test build
 # Build the CLI tool (auto-runs wire first)
 build: wire
 	@echo "Building $(BINARY_NAME)..."
-	go build $(LDFLAGS) -o $(BINARY_NAME) cmd/eogo/main.go
+	go build $(LDFLAGS) -o $(BINARY_NAME) cmd/zgo/main.go
 
 # Build the server
 build-server:
@@ -26,7 +26,7 @@ build-all: build build-server
 # Install CLI to $GOPATH/bin
 install: build
 	@echo "Installing $(BINARY_NAME)..."
-	go install $(LDFLAGS) ./cmd/eogo
+	go install $(LDFLAGS) ./cmd/zgo
 
 # Clean build artifacts
 clean:

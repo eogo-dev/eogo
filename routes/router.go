@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/eogo-dev/eogo/internal/app"
-	"github.com/eogo-dev/eogo/internal/infra/middleware"
-	"github.com/eogo-dev/eogo/internal/infra/monitor"
-	"github.com/eogo-dev/eogo/internal/infra/router"
+	"github.com/zgiai/zgo/internal/app"
+	"github.com/zgiai/zgo/internal/infra/middleware"
+	"github.com/zgiai/zgo/internal/infra/monitor"
+	"github.com/zgiai/zgo/internal/infra/router"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

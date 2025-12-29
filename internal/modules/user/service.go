@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/eogo-dev/eogo/internal/domain"
-	"github.com/eogo-dev/eogo/internal/infra/email"
-	"github.com/eogo-dev/eogo/internal/infra/jwt"
-	"github.com/eogo-dev/eogo/pkg/logger"
-	"github.com/eogo-dev/eogo/pkg/utils"
+	"github.com/zgiai/zgo/internal/domain"
+	"github.com/zgiai/zgo/internal/infra/email"
+	"github.com/zgiai/zgo/internal/infra/jwt"
+	"github.com/zgiai/zgo/pkg/logger"
+	"github.com/zgiai/zgo/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

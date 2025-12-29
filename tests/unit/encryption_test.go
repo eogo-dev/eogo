@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/eogo-dev/eogo/pkg/encryption"
+	"github.com/zgiai/zgo/pkg/encryption"
 )
 
 func TestEncryption_EncryptDecrypt(t *testing.T) {

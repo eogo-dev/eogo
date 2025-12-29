@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"github.com/eogo-dev/eogo/pkg/logger"
+	"github.com/zgiai/zgo/pkg/logger"
 )
 
 // InitLogger initializes the logger.

@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/eogo-dev/eogo/database/migrations"
-	"github.com/eogo-dev/eogo/internal/infra/events"
-	"github.com/eogo-dev/eogo/internal/infra/migration"
+	"github.com/zgiai/zgo/database/migrations"
+	"github.com/zgiai/zgo/internal/infra/events"
+	"github.com/zgiai/zgo/internal/infra/migration"
 	"gorm.io/gorm"
 )
 

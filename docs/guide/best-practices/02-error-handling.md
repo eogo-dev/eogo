@@ -7,7 +7,7 @@
 Use `pkg/response` for all API responses:
 
 ```go
-import "github.com/eogo-dev/eogo/pkg/response"
+import "github.com/zgiai/zgo/pkg/response"
 ```
 
 ## Success Responses

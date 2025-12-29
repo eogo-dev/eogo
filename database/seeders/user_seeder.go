@@ -1,7 +1,7 @@
 package seeders
 
 import (
-	"github.com/eogo-dev/eogo/internal/modules/user"
+	"github.com/zgiai/zgo/internal/modules/user"
 	"gorm.io/gorm"
 )
 

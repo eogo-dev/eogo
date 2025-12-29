@@ -4,7 +4,7 @@
 
 ## Overview
 
-Eogo provides production-grade resilience patterns:
+ZGO provides production-grade resilience patterns:
 
 | Pattern | Package | Purpose |
 |---------|---------|---------|
@@ -35,7 +35,7 @@ Prevents cascade failures by stopping requests to failing services.
 ### Usage
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/breaker"
+import "github.com/zgiai/zgo/internal/infra/breaker"
 
 // Create breaker
 cb := breaker.New(breaker.Config{
@@ -126,7 +126,7 @@ With singleflight:
 ### Usage
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/singleflight"
+import "github.com/zgiai/zgo/internal/infra/singleflight"
 
 sf := singleflight.New()
 
@@ -179,7 +179,7 @@ Handles transient failures with exponential backoff.
 ### Basic Usage
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/retry"
+import "github.com/zgiai/zgo/internal/infra/retry"
 
 err := retry.Do(ctx, func(ctx context.Context) error {
     return externalService.Call()
@@ -260,7 +260,7 @@ Protects resources from overload.
 ### Middleware
 
 ```go
-import "github.com/eogo-dev/eogo/internal/infra/ratelimit"
+import "github.com/zgiai/zgo/internal/infra/ratelimit"
 
 // Global rate limit
 r.Use(ratelimit.Middleware(ratelimit.Config{

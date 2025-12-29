@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/eogo-dev/eogo/pkg/pagination"
+	"github.com/zgiai/zgo/pkg/pagination"
 	"github.com/gin-gonic/gin"
 )
 

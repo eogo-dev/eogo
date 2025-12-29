@@ -1,4 +1,4 @@
-# Eogo Framework Guide
+# ZGO Framework Guide
 
 > EOGO (Evolving Orchestration for Go) - A modern Go web framework designed for high-velocity development.
 
@@ -54,8 +54,8 @@
 
 ```bash
 # Clone project
-git clone https://github.com/eogo-dev/eogo.git
-cd eogo
+git clone https://github.com/zgiai/zgo.git
+cd zgo
 
 # Install dependencies
 go mod download
@@ -64,10 +64,10 @@ go mod download
 make build
 
 # Create module
-./eogo make:module Blog
+./zgo make:module Blog
 
 # Run migrations
-./eogo migrate
+./zgo migrate
 
 # Start server
 make air
