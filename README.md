@@ -57,11 +57,31 @@ cp .env.example .env
 # Install dependencies
 go mod download
 
-# Start development server
+# Install zgo CLI globally (recommended)
+make install
+# Now you can use 'zgo' command anywhere!
+
+# Or just build locally
+make build
+./zgo serve
+
+# Start development server with hot-reload
 make air
 ```
 
 Visit: `http://localhost:8025`
+
+### Global Installation
+
+After `make install`, use zgo from anywhere:
+
+```bash
+zgo version               # Show version
+zgo serve                 # Start server
+zgo make:module Blog      # Generate new module
+zgo db:migrate            # Run migrations
+zgo db:migrate --env=prod # Production migrations
+```
 
 ---
 
