@@ -42,6 +42,9 @@ type Paginator[T any] struct {
 	lastPage    int
 	path        string
 	query       url.Values
+	fragment    string         // URL fragment (#section)
+	pageName    string         // Custom page parameter name
+	additional  map[string]any // Additional metadata
 }
 
 // Ensure Paginator implements PaginatableWithItems
@@ -76,6 +79,8 @@ func NewPaginator[T any](items []T, total int64, page, perPage int) *Paginator[T
 		currentPage: page,
 		lastPage:    lastPage,
 		query:       make(url.Values),
+		pageName:    "page",
+		additional:  make(map[string]any),
 	}
 }
 
@@ -174,6 +179,182 @@ func (p *Paginator[T]) Append(key, value string) *Paginator[T] {
 	return p
 }
 
+// Fragment sets the URL fragment (e.g., "#section").
+// The fragment will be appended to all pagination URLs.
+//
+// Example:
+//
+//	paginator.Fragment("comments")
+//	// URLs will be like: /posts?page=2#comments
+func (p *Paginator[T]) Fragment(fragment string) *Paginator[T] {
+	p.fragment = fragment
+	return p
+}
+
+// SetPageName sets a custom page parameter name.
+// Default is "page".
+//
+// Example:
+//
+//	paginator.SetPageName("p")
+//	// URLs will be like: /posts?p=2
+func (p *Paginator[T]) SetPageName(name string) *Paginator[T] {
+	p.pageName = name
+	return p
+}
+
+// Additional adds extra metadata to the response.
+// This data will be merged into the response alongside meta and links.
+//
+// Example:
+//
+//	paginator.Additional(map[string]any{
+//	    "filters_applied": true,
+//	    "sort_by": "created_at",
+//	})
+func (p *Paginator[T]) Additional(data map[string]any) *Paginator[T] {
+	for k, v := range data {
+		p.additional[k] = v
+	}
+	return p
+}
+
+// GetAdditional returns the additional metadata.
+func (p *Paginator[T]) GetAdditional() map[string]any {
+	if len(p.additional) == 0 {
+		return nil
+	}
+	return p.additional
+}
+
+// Through transforms each item using the provided function.
+// This is useful for converting domain objects to response DTOs.
+//
+// Example:
+//
+//	paginator.Through(func(user *domain.User) any {
+//	    return map[string]any{
+//	        "id":       user.ID,
+//	        "username": user.Username,
+//	    }
+//	})
+func (p *Paginator[T]) Through(fn func(T) any) *TransformedPaginator {
+	transformed := make([]any, len(p.items))
+	for i, item := range p.items {
+		transformed[i] = fn(item)
+	}
+	return &TransformedPaginator{
+		items:       transformed,
+		total:       p.total,
+		perPage:     p.perPage,
+		currentPage: p.currentPage,
+		lastPage:    p.lastPage,
+		path:        p.path,
+		query:       p.query,
+		fragment:    p.fragment,
+		pageName:    p.pageName,
+		additional:  p.additional,
+	}
+}
+
+// TransformedPaginator holds transformed pagination data.
+// Created by Paginator.Through().
+type TransformedPaginator struct {
+	items       []any
+	total       int64
+	perPage     int
+	currentPage int
+	lastPage    int
+	path        string
+	query       url.Values
+	fragment    string
+	pageName    string
+	additional  map[string]any
+}
+
+// GetItems returns the transformed items.
+func (p *TransformedPaginator) GetItems() any {
+	return p.items
+}
+
+// GetMeta returns pagination metadata.
+func (p *TransformedPaginator) GetMeta() *response.Meta {
+	from := 0
+	to := 0
+	if p.total > 0 {
+		from = (p.currentPage-1)*p.perPage + 1
+		to = p.currentPage * p.perPage
+		if int64(to) > p.total {
+			to = int(p.total)
+		}
+	}
+	return &response.Meta{
+		CurrentPage: p.currentPage,
+		PerPage:     p.perPage,
+		Total:       p.total,
+		LastPage:    p.lastPage,
+		From:        from,
+		To:          to,
+	}
+}
+
+// GetLinks returns pagination links.
+func (p *TransformedPaginator) GetLinks() *response.Links {
+	buildURL := func(page int) string {
+		query := make(url.Values)
+		for k, v := range p.query {
+			query[k] = v
+		}
+		pageName := p.pageName
+		if pageName == "" {
+			pageName = "page"
+		}
+		query.Set(pageName, strconv.Itoa(page))
+
+		result := p.path
+		if result == "" {
+			result = "?"
+		} else if !strings.Contains(result, "?") {
+			result += "?"
+		} else {
+			result += "&"
+		}
+		result += query.Encode()
+		if p.fragment != "" {
+			result += "#" + p.fragment
+		}
+		return result
+	}
+
+	var prev, next *string
+	if p.currentPage > 1 {
+		url := buildURL(p.currentPage - 1)
+		prev = &url
+	}
+	if p.currentPage < p.lastPage {
+		url := buildURL(p.currentPage + 1)
+		next = &url
+	}
+
+	return &response.Links{
+		First: buildURL(1),
+		Last:  buildURL(p.lastPage),
+		Prev:  prev,
+		Next:  next,
+	}
+}
+
+// GetAdditional returns additional metadata.
+func (p *TransformedPaginator) GetAdditional() map[string]any {
+	if len(p.additional) == 0 {
+		return nil
+	}
+	return p.additional
+}
+
+// Ensure TransformedPaginator implements PaginatableWithItems
+var _ response.PaginatableWithItems = (*TransformedPaginator)(nil)
+
 // URL generates the URL for a specific page.
 func (p *Paginator[T]) URL(page int) string {
 	if page < 1 {
@@ -187,18 +368,29 @@ func (p *Paginator[T]) URL(page int) string {
 	for k, v := range p.query {
 		query[k] = v
 	}
-	query.Set("page", strconv.Itoa(page))
 
+	pageName := p.pageName
+	if pageName == "" {
+		pageName = "page"
+	}
+	query.Set(pageName, strconv.Itoa(page))
+
+	var result string
 	if p.path == "" {
-		return "?" + query.Encode()
+		result = "?" + query.Encode()
+	} else {
+		separator := "?"
+		if strings.Contains(p.path, "?") {
+			separator = "&"
+		}
+		result = p.path + separator + query.Encode()
 	}
 
-	separator := "?"
-	if strings.Contains(p.path, "?") {
-		separator = "&"
+	if p.fragment != "" {
+		result += "#" + p.fragment
 	}
 
-	return p.path + separator + query.Encode()
+	return result
 }
 
 // FirstPageURL returns the URL for the first page.

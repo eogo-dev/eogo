@@ -122,6 +122,15 @@ response.HandleError(c, "message", err)  // Auto-maps error to status code
 response.Transform(c, user, func(u *User) any {
     return map[string]any{"id": u.ID, "name": u.Username}
 })
+
+// Conditional fields (Laravel-style)
+response.Success(c, map[string]any{
+    "id":       user.ID,
+    "email":    response.When(user.IsVerified, user.Email),      // 条件输出
+    "avatar":   response.WhenNotNil(user.Avatar),                // 非nil才输出
+    "bio":      response.WhenNotEmpty(user.Bio),                 // 非空才输出
+    "is_admin": response.When(isAdmin, true),                    // 权限控制
+})
 ```
 
 ## Pagination
@@ -131,7 +140,6 @@ import "github.com/eogo-dev/eogo/pkg/pagination"
 
 // ========== 方式1: Handler 直接查询 (最简单，AI推荐) ==========
 func (h *Handler) List(c *gin.Context) {
-    // 一行搞定！自动处理 page, per_page, path, query
     paginator, err := pagination.Auto[*domain.User](c, h.db.Model(&UserPO{}))
     if err != nil {
         response.HandleError(c, "Failed to list", err)
@@ -146,15 +154,6 @@ paginator, err := pagination.AutoWithScope[*domain.User](c, h.db, func(db *gorm.
 })
 
 // ========== 方式2: 通过 Service 层 (DDD标准) ==========
-// Service:
-func (s *service) List(ctx context.Context, page, perPage int) (*pagination.Result[*domain.User], error) {
-    users, total, err := s.repo.FindAll(ctx, page, perPage)
-    if err != nil {
-        return nil, err
-    }
-    return pagination.NewResult(users, total, page, perPage), nil
-}
-
 // Handler:
 func (h *Handler) List(c *gin.Context) {
     req := pagination.FromContext(c)
@@ -163,8 +162,23 @@ func (h *Handler) List(c *gin.Context) {
         response.HandleError(c, "Failed to list", err)
         return
     }
-    response.Success(c, result.ToPaginator(c))  // 自动设置 path 和 query
+    response.Success(c, result.ToPaginator(c))
 }
+
+// ========== 高级功能 (Laravel-style) ==========
+// Through - 转换每个item
+paginator.Through(func(u *domain.User) any {
+    return map[string]any{"id": u.ID, "name": u.Username}
+})
+
+// Additional - 添加额外元数据
+paginator.Additional(map[string]any{"filters": "active"})
+
+// Fragment - URL锚点
+paginator.Fragment("comments")  // URLs: /posts?page=2#comments
+
+// SetPageName - 自定义分页参数名
+paginator.SetPageName("p")  // URLs: /posts?p=2
 ```
 
 ## Complete Handler Example
