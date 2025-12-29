@@ -4,7 +4,7 @@ Instructions for AI coding agents working on the ZGO framework.
 
 ## Project Overview
 
-EOGO is a modern Go framework using Domain-Driven Design (DDD) + layered architecture.
+ZGO is a modern Go framework using Domain-Driven Design (DDD) + layered architecture.
 
 ## Directory Structure
 

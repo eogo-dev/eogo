@@ -2,7 +2,7 @@
 FROM golang:1.24-alpine AS builder
 
 # Set author label
-LABEL maintainer="Eogo Team <team@eogo-dev.com>"
+LABEL maintainer="ZGO Team <team@eogo-dev.com>"
 
 # Install git for dependency downloading
 RUN apk add --no-cache git
@@ -18,7 +18,7 @@ RUN go mod download
 COPY . .
 
 # Build application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o eogo-server cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o zgo-server cmd/server/main.go
 
 # Run stage
 FROM alpine:latest
@@ -37,7 +37,7 @@ RUN mkdir -p /app/config /app/logs /app/storage
 WORKDIR /app
 
 # Copy binary from build stage
-COPY --from=builder /app/eogo-server .
+COPY --from=builder /app/zgo-server .
 COPY --from=builder /app/.env.example ./.env
 
 # Set permissions
@@ -54,4 +54,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8025/api/v1/health/ping || exit 1
 
 # Start command
-CMD ["./eogo-server"]
+CMD ["./zgo-server"]

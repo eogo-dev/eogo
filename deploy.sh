@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Deployment script for Eogo
+# Deployment script for ZGO
 set -e
 
-echo "🚀 Starting deployment of Eogo..."
+echo "🚀 Starting deployment of ZGO..."
 
 # Build the Docker image
 echo "📦 Building Docker image..."
-docker build -t eogo:latest .
+docker build -t zgo:latest .
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
@@ -37,6 +37,6 @@ if [[ $HEALTH_CHECK == *"ok"* ]]; then
 else
     echo "❌ Deployment failed! Health check returned: $HEALTH_CHECK"
     echo "📜 Container logs:"
-    docker logs eogo-prod
+    docker logs zgo-prod
     exit 1
 fi

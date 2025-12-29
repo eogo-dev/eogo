@@ -28,7 +28,7 @@ func (c *PluginListCommand) Description() string {
 }
 
 func (c *PluginListCommand) Usage() string {
-	return "eogo plugin:list"
+	return "zgo plugin:list"
 }
 
 func (c *PluginListCommand) Run(args []string) error {
@@ -39,7 +39,7 @@ func (c *PluginListCommand) Run(args []string) error {
 		c.output.Info("No plugins installed")
 		c.output.Info("")
 		c.output.Info("Install plugins with:")
-		c.output.Info("  go install github.com/zgiai/zgo-ai/cmd/eogo-ai@latest")
+		c.output.Info("  go install github.com/zgiai/zgo-ai/cmd/zgo-ai@latest")
 		return nil
 	}
 
@@ -60,8 +60,8 @@ func (c *PluginListCommand) Run(args []string) error {
 	}
 
 	c.output.Info("")
-	c.output.Info("Usage: eogo <plugin-name> <command> [args...]")
-	c.output.Info("Example: eogo ai docs user")
+	c.output.Info("Usage: zgo <plugin-name> <command> [args...]")
+	c.output.Info("Example: zgo ai docs user")
 
 	return nil
 }

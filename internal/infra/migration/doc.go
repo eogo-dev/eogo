@@ -1,5 +1,5 @@
 // Package migration provides a Laravel-inspired database migration system
-// for the Eogo framework.
+// for the ZGO framework.
 //
 // The migration system consists of several interconnected components:
 //

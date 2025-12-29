@@ -185,9 +185,9 @@ func SendPasswordResetEmail(to string, newPassword string) error {
 
 // SendWelcomeEmail sends a welcome email
 func SendWelcomeEmail(to string, username string) error {
-	subject := "Welcome to Eogo"
+	subject := "Welcome to ZGO"
 	htmlContent := fmt.Sprintf(`
-		<h2>Welcome to Eogo</h2>
+		<h2>Welcome to ZGO</h2>
 		<p>Dear %s,</p>
 		<p>Thank you for registering as our user!</p>
 		<p>If you have any questions, please feel free to contact our support team.</p>

@@ -9,7 +9,7 @@ import (
 	"github.com/zgiai/zgo/internal/infra/lifecycle"
 )
 
-// Example: How to use Lifecycle in Eogo
+// Example: How to use Lifecycle in ZGO
 
 // ============================================
 // 1. Infrastructure Layer - Database (Mock)

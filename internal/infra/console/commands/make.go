@@ -202,7 +202,7 @@ func (c *MakeSeederCommand) Run(args []string) error {
 	}
 
 	c.output.Success("Seeder created: %s", filename)
-	c.output.Info("Run with: ./eogo db:seed")
+	c.output.Info("Run with: ./zgo db:seed")
 	return nil
 }
 

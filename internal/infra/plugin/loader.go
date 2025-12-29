@@ -15,7 +15,7 @@ type Plugin interface {
 }
 
 // Discover automatically discovers installed plugins in PATH
-// Looks for executables matching pattern: eogo-*
+// Looks for executables matching pattern: zgo-*
 func Discover() []PluginInfo {
 	var plugins []PluginInfo
 
@@ -37,8 +37,8 @@ func Discover() []PluginInfo {
 	discovered := make(map[string]bool)
 
 	for _, dir := range paths {
-		// Find all eogo-* executables
-		pattern := filepath.Join(dir, "eogo-*")
+		// Find all zgo-* executables
+		pattern := filepath.Join(dir, "zgo-*")
 		matches, err := filepath.Glob(pattern)
 		if err != nil {
 			continue
@@ -50,8 +50,8 @@ func Discover() []PluginInfo {
 				continue
 			}
 
-			// Extract plugin name (remove eogo- prefix)
-			name := strings.TrimPrefix(filepath.Base(match), "eogo-")
+			// Extract plugin name (remove zgo- prefix)
+			name := strings.TrimPrefix(filepath.Base(match), "zgo-")
 
 			// Skip if already discovered
 			if discovered[name] {
@@ -110,7 +110,7 @@ func getPluginVersion(binary string) string {
 
 // Execute runs a plugin command
 func Execute(pluginName string, args []string) error {
-	binary := "eogo-" + pluginName
+	binary := "zgo-" + pluginName
 	cmd := exec.Command(binary, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -120,7 +120,7 @@ func Execute(pluginName string, args []string) error {
 
 // IsInstalled checks if a plugin is installed
 func IsInstalled(pluginName string) bool {
-	binary := "eogo-" + pluginName
+	binary := "zgo-" + pluginName
 	_, err := exec.LookPath(binary)
 	return err == nil
 }
