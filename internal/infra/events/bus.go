@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/zgiai/zgo/pkg/events"
 )
 
 // EventBus handles event publishing and subscription with priority support,
@@ -89,14 +90,16 @@ func (b *EventBus) Use(middleware ...EventMiddleware) {
 }
 
 // Publish sends an event to all matching subscribers synchronously.
-// Returns the first error encountered, or nil if all handlers succeed.
-// Respects context cancellation.
-func (b *EventBus) Publish(ctx context.Context, event Event) error {
+// If the event does not satisfy the infra.Event interface, it is automatically wrapped with metadata.
+func (b *EventBus) Publish(ctx context.Context, e events.Event) error {
 	b.mu.RLock()
 	if b.closed {
 		b.mu.RUnlock()
 		return ErrEventBusClosed
 	}
+
+	// Ensure event has metadata by wrapping if necessary
+	event := Wrap(e)
 
 	// Find matching handlers
 	matchingHandlers := b.findMatchingHandlers(event.EventName())
@@ -134,9 +137,9 @@ func (b *EventBus) Publish(ctx context.Context, event Event) error {
 
 // PublishAsync sends an event to all matching subscribers asynchronously.
 // Does not wait for handlers to complete and does not return errors.
-func (b *EventBus) PublishAsync(ctx context.Context, event Event) {
+func (b *EventBus) PublishAsync(ctx context.Context, e events.Event) {
 	go func() {
-		_ = b.Publish(ctx, event)
+		_ = b.Publish(ctx, e)
 	}()
 }
 

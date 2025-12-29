@@ -37,7 +37,7 @@ func InitApplication() (*app.Application, error) {
 	repository := migration.NewDatabaseRepositoryProvider(db)
 	migrator := migration.NewMigratorProvider(repository, db, eventBus)
 	userRepository := user.NewRepository(db)
-	userService := user.NewService(userRepository, service)
+	userService := user.NewService(userRepository, service, eventBus)
 	handler := user.NewHandler(userService)
 	permissionRepository := permission.NewRepository(db)
 	permissionService := permission.NewService(permissionRepository)

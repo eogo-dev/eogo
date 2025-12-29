@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/zgiai/zgo/internal/app"
 	"github.com/zgiai/zgo/internal/infra/router"
-	"github.com/gin-gonic/gin"
 )
 
 // RegisterAPI registers all API routes using fluent router
@@ -16,6 +16,7 @@ func RegisterAPI(r *router.Router, handlers *app.Handlers) {
 	}).Name("health")
 
 	// 2. Register Module Routes
-	handlers.User.RegisterRoutes(r)
-	handlers.Permission.RegisterRoutes(r)
+	for _, m := range handlers.Modules() {
+		m.RegisterRoutes(r)
+	}
 }

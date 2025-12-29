@@ -7,14 +7,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/zgiai/zgo/pkg/events"
 )
 
 // Event represents a domain event with metadata support
 type Event interface {
-	// EventName returns the unique event identifier (e.g., "user.created")
-	EventName() string
-	// OccurredAt returns when the event occurred
-	OccurredAt() time.Time
+	events.Event
 	// Metadata returns event metadata for tracing and correlation
 	Metadata() EventMetadata
 }
@@ -78,6 +76,30 @@ func (e BaseEvent) OccurredAt() time.Time {
 // Metadata returns the event metadata
 func (e BaseEvent) Metadata() EventMetadata {
 	return e.metadata
+}
+
+// WrappedEvent wraps a simple events.Event to satisfy the infra.Event interface
+type WrappedEvent struct {
+	events.Event
+	metadata EventMetadata
+}
+
+func (e WrappedEvent) Metadata() EventMetadata {
+	return e.metadata
+}
+
+// Wrap converts a simple event to an infra event
+func Wrap(e events.Event) Event {
+	if ie, ok := e.(Event); ok {
+		return ie
+	}
+	return WrappedEvent{
+		Event: e,
+		metadata: EventMetadata{
+			ID:        uuid.New().String(),
+			Timestamp: e.OccurredAt(),
+		},
+	}
 }
 
 // NewBaseEvent creates a new base event with auto-generated metadata

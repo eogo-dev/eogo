@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 // Domain-specific errors
 // These are business errors that can be returned by any layer
@@ -20,3 +23,33 @@ var (
 	ErrConflict     = errors.New("resource already exists")
 	ErrInvalidInput = errors.New("invalid input")
 )
+
+// Events
+const (
+	EventUserCreated = "user.created"
+)
+
+// UserCreatedEvent is triggered when a new user registers
+type UserCreatedEvent struct {
+	User       *User
+	occurredAt time.Time
+}
+
+func NewUserCreatedEvent(user *User) UserCreatedEvent {
+	return UserCreatedEvent{
+		User:       user,
+		occurredAt: time.Now(),
+	}
+}
+
+func (e UserCreatedEvent) EventName() string {
+	return EventUserCreated
+}
+
+func (e UserCreatedEvent) OccurredAt() time.Time {
+	return e.occurredAt
+}
+
+func (e UserCreatedEvent) Data() any {
+	return e.User
+}

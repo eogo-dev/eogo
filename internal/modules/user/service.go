@@ -7,8 +7,8 @@ import (
 
 	"github.com/zgiai/zgo/internal/domain"
 	"github.com/zgiai/zgo/internal/infra/email"
+	"github.com/zgiai/zgo/internal/infra/events"
 	"github.com/zgiai/zgo/internal/infra/jwt"
-	"github.com/zgiai/zgo/pkg/logger"
 	"github.com/zgiai/zgo/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -38,13 +38,15 @@ type Service interface {
 type service struct {
 	repo       domain.UserRepository
 	jwtService *jwt.Service
+	eventBus   *events.EventBus
 }
 
 // NewService creates a new service instance
-func NewService(repo domain.UserRepository, jwtService *jwt.Service) *service {
+func NewService(repo domain.UserRepository, jwtService *jwt.Service, eventBus *events.EventBus) *service {
 	return &service{
 		repo:       repo,
 		jwtService: jwtService,
+		eventBus:   eventBus,
 	}
 }
 
@@ -79,12 +81,8 @@ func (s *service) Register(ctx context.Context, req *UserRegisterRequest) (*doma
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	// Send welcome email (async, don't block)
-	go func() {
-		if err := email.SendWelcomeEmail(user.Email, user.Username); err != nil {
-			logger.Error("failed to send welcome email", map[string]any{"error": err})
-		}
-	}()
+	// Publish UserCreated event (fully decoupled side effects)
+	s.eventBus.PublishAsync(ctx, domain.NewUserCreatedEvent(user))
 
 	return user, nil
 }

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/zgiai/zgo/internal/contracts"
 	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/zgiai/zgo/internal/infra/email"
 	"github.com/zgiai/zgo/internal/infra/events"
@@ -27,4 +28,12 @@ type Application struct {
 type Handlers struct {
 	User       *user.Handler
 	Permission *permission.Handler
+}
+
+// Modules returns a list of all active modules
+func (h *Handlers) Modules() []contracts.Module {
+	return []contracts.Module{
+		h.User,
+		h.Permission,
+	}
 }

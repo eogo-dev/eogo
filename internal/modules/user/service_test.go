@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"github.com/zgiai/zgo/internal/domain"
 	"github.com/zgiai/zgo/internal/infra/jwt"
 	"github.com/zgiai/zgo/pkg/utils"
 	"github.com/zgiai/zgo/test/mocks"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -123,7 +123,8 @@ func TestService_Login(t *testing.T) {
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
 	mockJWT := mocks.NewMockJWTService(ctrl)
-	service := NewService(mockRepo, &jwt.Service{}) // We'll mock the GenerateToken call
+	mockEventBus := mocks.NewMockEventBus(ctrl)            // Added mockEventBus
+	service := NewService(mockRepo, mockJWT, mockEventBus) // Updated NewService call
 
 	tests := []struct {
 		name        string
@@ -153,6 +154,7 @@ func TestService_Login(t *testing.T) {
 					assert.NotNil(t, u.LastLogin)
 					return nil
 				}).AnyTimes()
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -178,6 +180,7 @@ func TestService_Login(t *testing.T) {
 					assert.NotNil(t, u.LastLogin)
 					return nil
 				}).AnyTimes()
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -281,8 +284,9 @@ func TestService_GetProfile(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
-	mockJWT := &jwt.Service{}
-	service := NewService(mockRepo, mockJWT)
+	mockJWT := mocks.NewMockJWTService(ctrl)               // Changed to mockJWT
+	mockEventBus := mocks.NewMockEventBus(ctrl)            // Added mockEventBus
+	service := NewService(mockRepo, mockJWT, mockEventBus) // Updated NewService call
 
 	tests := []struct {
 		name        string
@@ -345,8 +349,9 @@ func TestService_UpdateProfile(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
-	mockJWT := &jwt.Service{}
-	service := NewService(mockRepo, mockJWT)
+	mockJWT := mocks.NewMockJWTService(ctrl)               // Changed to mockJWT
+	mockEventBus := mocks.NewMockEventBus(ctrl)            // Added mockEventBus
+	service := NewService(mockRepo, mockJWT, mockEventBus) // Updated NewService call
 
 	tests := []struct {
 		name        string
@@ -386,6 +391,7 @@ func TestService_UpdateProfile(t *testing.T) {
 					assert.Equal(t, "Updated bio", u.Bio)
 					return nil
 				})
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -412,10 +418,11 @@ func TestService_UpdateProfile(t *testing.T) {
 				mockRepo.EXPECT().Update(gomock.Any(), gomock.Any()).DoAndReturn(func(ctx context.Context, u *domain.User) error {
 					assert.Equal(t, "New Nickname", u.Nickname)
 					assert.Equal(t, "old-avatar.jpg", u.Avatar) // unchanged
-					assert.Equal(t, "1111111111", u.Phone)    // unchanged
-					assert.Equal(t, "Old bio", u.Bio)          // unchanged
+					assert.Equal(t, "1111111111", u.Phone)      // unchanged
+					assert.Equal(t, "Old bio", u.Bio)           // unchanged
 					return nil
 				})
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -474,8 +481,9 @@ func TestService_ChangePassword(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
-	mockJWT := &jwt.Service{}
-	service := NewService(mockRepo, mockJWT)
+	mockJWT := mocks.NewMockJWTService(ctrl)               // Changed to mockJWT
+	mockEventBus := mocks.NewMockEventBus(ctrl)            // Added mockEventBus
+	service := NewService(mockRepo, mockJWT, mockEventBus) // Updated NewService call
 
 	tests := []struct {
 		name        string
@@ -507,6 +515,7 @@ func TestService_ChangePassword(t *testing.T) {
 					assert.NoError(t, err)
 					return nil
 				})
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -606,8 +615,9 @@ func TestService_ResetPassword(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockUserRepository(ctrl)
-	mockJWT := &jwt.Service{}
-	service := NewService(mockRepo, mockJWT)
+	mockJWT := mocks.NewMockJWTService(ctrl)               // Changed to mockJWT
+	mockEventBus := mocks.NewMockEventBus(ctrl)            // Added mockEventBus
+	service := NewService(mockRepo, mockJWT, mockEventBus) // Updated NewService call
 
 	tests := []struct {
 		name        string
@@ -634,6 +644,7 @@ func TestService_ResetPassword(t *testing.T) {
 					assert.NotEqual(t, "oldhash", u.Password)
 					return nil
 				})
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false,
 		},
@@ -699,6 +710,9 @@ func TestService_ResetPassword(t *testing.T) {
 				}
 				mockRepo.EXPECT().FindByEmail(gomock.Any(), "test@example.com").Return(user, nil)
 				mockRepo.EXPECT().Update(gomock.Any(), gomock.Any()).Return(nil)
+				// No mock for email service, so it would fail if it were a dependency.
+				// Assuming the current implementation handles email sending outside the core logic or logs errors.
+				mockEventBus.EXPECT().PublishAsync(gomock.Any(), gomock.Any()).AnyTimes() // Expect PublishAsync
 			},
 			wantErr: false, // email failure should not cause method to fail
 		},

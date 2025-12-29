@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/zgiai/zgo/internal/app"
 	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/zgiai/zgo/internal/infra/health"
@@ -20,8 +22,6 @@ import (
 	"github.com/zgiai/zgo/pkg/logger"
 	"github.com/zgiai/zgo/pkg/support"
 	"github.com/zgiai/zgo/routes"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 )
 
 // HttpKernel handles HTTP server lifecycle
@@ -88,6 +88,14 @@ func NewHttpKernel(application *app.Application) *HttpKernel {
 	// Register health and metrics routes
 	h.RegisterRoutes(r)
 	r.GET("/metrics", metrics.Handler())
+
+	// Initialize Modules (Events and Init)
+	for _, m := range application.Handlers.Modules() {
+		if err := m.Init(); err != nil {
+			log.Printf("Warning: Module %s failed to initialize: %v", m.Name(), err)
+		}
+		m.RegisterEvents(application.EventBus)
+	}
 
 	// Register Routes
 	// We temporarily silence Gin's default route logging to keep console clean

@@ -22,7 +22,7 @@ func NewRepository(db *gorm.DB) *repository {
 
 // Create adds a new user
 func (r *repository) Create(ctx context.Context, user *domain.User) error {
-	po := toUserPO(user)
+	po := newUserPO(user)
 	if err := r.db.WithContext(ctx).Create(po).Error; err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (r *repository) Create(ctx context.Context, user *domain.User) error {
 
 // Update modifies an existing user
 func (r *repository) Update(ctx context.Context, user *domain.User) error {
-	po := toUserPO(user)
+	po := newUserPO(user)
 	if err := r.db.WithContext(ctx).Save(po).Error; err != nil {
 		return err
 	}

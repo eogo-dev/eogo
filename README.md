@@ -71,9 +71,27 @@ make air
 
 Visit: `http://localhost:8025`
 
+### Windows Users 🪟
+
+Windows users can use the provided PowerShell or batch scripts:
+
+```powershell
+# PowerShell (Recommended)
+.\make.ps1 setup
+.\make.ps1 install
+.\make.ps1 dev
+
+# Or Command Prompt
+make.bat setup
+make.bat install
+make.bat dev
+```
+
+See [Windows Development Guide](docs/WINDOWS.md) for detailed setup instructions.
+
 ### Global Installation
 
-After `make install`, use zgo from anywhere:
+After `make install` (or `.\make.ps1 install` on Windows), use zgo from anywhere:
 
 ```bash
 zgo version               # Show version
@@ -102,6 +120,7 @@ make docs          # Generate API docs
 ## 📖 Documentation
 
 - [Development Guide](docs/guide/README.md)
+- [**Windows Development Guide**](docs/WINDOWS.md) 🪟
 - [Module Development](internal/modules/README.md)
 - [Dependency Injection (Wire)](docs/dependency_injection.md)
 - [AI Collaboration Guide](AGENTS.md)

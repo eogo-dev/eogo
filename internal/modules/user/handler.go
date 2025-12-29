@@ -1,20 +1,34 @@
 package user
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/zgiai/zgo/internal/contracts"
+	"github.com/zgiai/zgo/internal/domain"
+	"github.com/zgiai/zgo/internal/infra/events"
 	"github.com/zgiai/zgo/pkg/handler"
 	"github.com/zgiai/zgo/pkg/pagination"
 	"github.com/zgiai/zgo/pkg/response"
-	"github.com/gin-gonic/gin"
 )
 
-// Handler handles user-related HTTP requests
+// Handler handles user-related HTTP requests and implements contracts.Module
 type Handler struct {
+	contracts.BaseModule
 	service Service
 }
 
 // NewHandler creates a new Handler instance
 func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
+}
+
+// Name returns the module name
+func (h *Handler) Name() string {
+	return "user"
+}
+
+// RegisterEvents registers user module event listeners
+func (h *Handler) RegisterEvents(bus *events.EventBus) {
+	bus.Subscribe(domain.EventUserCreated, HandleUserCreated, events.WithAsync())
 }
 
 // ============================================================================

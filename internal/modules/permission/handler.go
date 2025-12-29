@@ -4,18 +4,25 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/zgiai/zgo/pkg/response"
 	"github.com/gin-gonic/gin"
+	"github.com/zgiai/zgo/internal/contracts"
+	"github.com/zgiai/zgo/pkg/response"
 )
 
-// Handler handles permission-related HTTP requests
+// Handler handles permission-related HTTP requests and implements contracts.Module
 type Handler struct {
+	contracts.BaseModule
 	service Service
 }
 
 // NewHandler creates a new permission handler
 func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
+}
+
+// Name returns the module name
+func (h *Handler) Name() string {
+	return "permission"
 }
 
 // CreateRole creates a new role

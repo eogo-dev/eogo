@@ -5,18 +5,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/zgiai/zgo/internal/app"
 	"github.com/zgiai/zgo/internal/bootstrap"
 	"github.com/zgiai/zgo/internal/infra/config"
 	"github.com/zgiai/zgo/internal/infra/database"
 	"github.com/zgiai/zgo/internal/infra/email"
+	"github.com/zgiai/zgo/internal/infra/events"
 	"github.com/zgiai/zgo/internal/infra/jwt"
 	"github.com/zgiai/zgo/internal/infra/middleware"
 	test_platform "github.com/zgiai/zgo/internal/infra/testing"
 	"github.com/zgiai/zgo/internal/modules/permission"
 	"github.com/zgiai/zgo/internal/modules/user"
 	"github.com/zgiai/zgo/routes"
-	"github.com/gin-gonic/gin"
 )
 
 // SetupApp initializes the application for feature testing.
@@ -49,6 +50,7 @@ func SetupApp() *gin.Engine {
 	// 4. Create Services via DI
 	jwtService := jwt.NewService(cfg)
 	emailService := email.NewService(cfg)
+	eventBus := events.NewEventBus()
 
 	// Set JWT service for middleware
 	middleware.SetJWTService(jwtService)
@@ -58,7 +60,7 @@ func SetupApp() *gin.Engine {
 	permRepo := permission.NewRepository(db)
 
 	// 6. Create Services
-	userService := user.NewService(userRepo, jwtService)
+	userService := user.NewService(userRepo, jwtService, eventBus)
 	permService := permission.NewService(permRepo)
 
 	// 7. Create Handlers
